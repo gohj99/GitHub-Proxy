@@ -3,6 +3,29 @@
   // This is a site policy configuration, not an exhaustive or official legal list.
   const BLOCKED_TERMS = {
     nationalSecurity: [
+      "8964",
+      "六四事件",
+      "六四天安门",
+      "天安门事件",
+      "天安门屠杀",
+      "六四屠杀",
+      "白纸革命",
+      "白纸运动",
+      "白纸抗议",
+      "习近平",
+      "习禁评",
+      "习包子",
+      "法轮功",
+      "法輪功",
+      "法轮大法",
+      "法輪大法",
+      "falun gong",
+      "falun dafa",
+      "tiananmen massacre",
+      "tiananmen square protests",
+      "xi jinping",
+      "共产党下台",
+      "推翻共产党",
       "煽动颠覆国家政权",
       "煽动分裂国家",
       "宣扬恐怖主义",
@@ -19,6 +42,18 @@
       "成人视频下载",
       "色情直播",
       "招嫖",
+      "招妓",
+      "卖淫",
+      "卖淫嫖娼",
+      "嫖娼",
+      "援交",
+      "色情服务",
+      "上门服务",
+      "同城约炮",
+      "裸聊",
+      " prostitution ",
+      "prostitute for hire",
+      "escort service",
       "卖淫服务",
       "嫖娼服务",
       "child pornography",
@@ -111,6 +146,14 @@
       // Include the complete current URL so disallowed terms in repository
       // paths, query parameters or fragments are also checked.
       window.location ? window.location.href : "",
+      (() => {
+        if (!window.location) return "";
+        try {
+          return decodeURIComponent(window.location.href);
+        } catch (_) {
+          return "";
+        }
+      })(),
       document.title,
       description ? description.content : "",
       document.body ? document.body.innerText : "",
@@ -130,23 +173,31 @@
     if (url.hostname.toLowerCase() !== "github.gohj99.site") return false;
 
     const segments = url.pathname.split("/").filter(Boolean);
-    if (segments.length < 2) return false;
+    if (segments.length < 1) return false;
 
     const user = decodeURIComponent(segments[0]).toLowerCase();
-    const repo = decodeURIComponent(segments[1]).replace(/\.git$/i, "").toLowerCase();
 
     return BLOCKED_REPOSITORIES.some((entry) => {
       if (!entry || String(entry.user).toLowerCase() !== user) return false;
 
       // An empty repository value is a wildcard for the whole user.
       const blockedRepo = String(entry.repo || "").replace(/\.git$/i, "").toLowerCase();
-      return blockedRepo === "" || blockedRepo === repo;
+      if (blockedRepo === "") return true;
+      if (segments.length < 2) return false;
+
+      const repo = decodeURIComponent(segments[1]).replace(/\.git$/i, "").toLowerCase();
+      return blockedRepo === repo;
     });
   };
 
   const blockPage = (matchedTerm) => {
     if (blocked) return;
     blocked = true;
+
+    // Keep the in-page overlay as the immediate response, then move to the
+    // standalone local page. This prevents a visible gap while redirecting.
+    const blockedPageUrl = "/static/content-blocked.html";
+    const shouldRedirect = window.location && window.location.pathname !== blockedPageUrl;
 
     const host = document.createElement("div");
     host.id = "github-proxy-content-blocked";
@@ -228,6 +279,10 @@
     );
 
     console.warn("[GitHub Proxy] Page blocked by content policy:", matchedTerm);
+
+    if (shouldRedirect) {
+      window.setTimeout(() => window.location.replace(blockedPageUrl), 0);
+    }
   };
 
   const scanPage = () => {
