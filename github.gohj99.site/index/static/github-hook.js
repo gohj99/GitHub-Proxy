@@ -24,6 +24,20 @@
       "tiananmen massacre",
       "tiananmen square protests",
       "xi jinping",
+      "时政",
+      "政治新闻",
+      "国内新闻",
+      "国际新闻",
+      "新闻时事",
+      "新闻评论",
+      "政治评论",
+      "政治敏感",
+      "维权",
+      "抗议活动",
+      "社会事件",
+      "government news",
+      "political news",
+      "current affairs",
       "共产党下台",
       "推翻共产党",
       "煽动颠覆国家政权",
@@ -102,14 +116,11 @@
     ],
   };
 
-  // Exact repository denylist. Matching is performed against the first two
-  // URL path segments (owner and repository), so partial names do not match.
-  // GitHub treats these names case-insensitively; trailing slashes and a
-  // repository suffix such as ".git" are accepted.
+  // Exact repository denylist. An empty repo blocks the user's entire
+  // namespace; a non-empty repo requires a complete repository-name match.
   const BLOCKED_REPOSITORIES = [
     { user: "bannedbook", repo: "" },
-    // { user: "example-user", repo: "example-repo" },
-    // { user: "blocked-user", repo: "" }, // block every repository of this user
+    { user: "htcc", repo: "" },
   ];
 
   const normalizeText = (value) => {
@@ -173,16 +184,15 @@
     if (url.hostname.toLowerCase() !== "github.gohj99.site") return false;
 
     const segments = url.pathname.split("/").filter(Boolean);
-    if (segments.length < 1) return false;
+    if (!segments.length) return false;
 
     const user = decodeURIComponent(segments[0]).toLowerCase();
 
     return BLOCKED_REPOSITORIES.some((entry) => {
       if (!entry || String(entry.user).toLowerCase() !== user) return false;
 
-      // An empty repository value is a wildcard for the whole user.
       const blockedRepo = String(entry.repo || "").replace(/\.git$/i, "").toLowerCase();
-      if (blockedRepo === "") return true;
+      if (!blockedRepo) return true;
       if (segments.length < 2) return false;
 
       const repo = decodeURIComponent(segments[1]).replace(/\.git$/i, "").toLowerCase();
