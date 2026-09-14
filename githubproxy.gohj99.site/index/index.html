@@ -1,7 +1,163 @@
 <!doctype html>
-<html>
-<head>
-    <meta charset="utf-8">
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GitHub 镜像站</title>
+    <meta
+      name="description"
+      content="gohj99 - GitHub 镜像站，提供稳定、快速的 GitHub 网页、仓库与资源访问入口。输入 GitHub 链接即可开始。"
+    />
+    <meta
+      name="keywords"
+      content="GitHub镜像, GitHub加速, GitHub代理, GitHub访问, GitHub资源, GitHub仓库, GitHub开源, GitHub网页, GitHub入口, gohj99"
+    />
+    <link rel="canonical" href="https://githubproxy.gohj99.site/" />
+    <meta property="og:title" content="GitHub 镜像站" />
+    <meta
+      property="og:description"
+      content="快速访问 GitHub 仓库、代码和开源资源。"
+    />
+    <style>
+      body {
+        margin: 0;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          "PingFang SC",
+          sans-serif;
+        color: #172033;
+      }
+      .top {
+        height: 4px;
+        background: #2864dc;
+      }
+      .wrap {
+        max-width: 1060px;
+        margin: auto;
+        padding: 0 24px;
+      }
+      .nav {
+        height: 76px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #e4e8f0;
+      }
+      .brand {
+        font-weight: 700;
+      }
+      .nav a {
+        color: #657089;
+        text-decoration: none;
+        font-size: 14px;
+      }
+      .hero {
+        padding: 76px 0;
+      }
+      .eyebrow {
+        color: #2864dc;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+      }
+      .hero h1 {
+        font-size: clamp(38px, 6vw, 64px);
+        line-height: 1.08;
+        margin: 17px 0;
+      }
+      .hero p {
+        font-size: 18px;
+        line-height: 1.7;
+        color: #657089;
+        max-width: 610px;
+      }
+      .search {
+        display: flex;
+        max-width: 700px;
+        margin-top: 34px;
+        padding: 6px;
+        border: 1px solid #cfd7e5;
+        border-radius: 10px;
+      }
+      .search input {
+        flex: 1;
+        border: 0;
+        outline: 0;
+        padding: 13px;
+        font-size: 15px;
+        min-width: 0;
+      }
+      .search button {
+        border: 0;
+        border-radius: 7px;
+        background: #2864dc;
+        color: #fff;
+        padding: 0 22px;
+        font-weight: 600;
+      }
+      .hint {
+        font-size: 12px;
+        color: #8a94a8;
+        margin-top: 10px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin: 0 0 48px;
+      }
+      .card {
+        border: 1px solid #e4e8f0;
+        border-radius: 8px;
+        padding: 20px;
+        text-decoration: none;
+        color: inherit;
+      }
+      .card strong {
+        display: block;
+        margin: 8px 0;
+      }
+      .card span {
+        font-size: 13px;
+        color: #657089;
+      }
+      .notice {
+        padding: 16px;
+        border-left: 3px solid #91a9df;
+        background: #f5f8ff;
+        color: #657089;
+        font-size: 13px;
+      }
+      .footer {
+        border-top: 1px solid #e4e8f0;
+        padding: 24px 0;
+        color: #8791a4;
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+      }
+      @media (max-width: 700px) {
+        .nav a {
+          display: none;
+        }
+        .hero {
+          padding: 58px 0;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .footer {
+          display: block;
+        }
+        .footer a {
+          display: block;
+          margin-top: 8px;
+        }
+      }
+    </style>
     <script type="text/javascript">
         (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -9,9 +165,62 @@
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
         })(window, document, "clarity", "script", "yi86qtfbfq");
     </script>
-    <title>title</title>
-</head>
-<body>
-<h1>Hello</h1>
-</body>
+  </head>
+  <body>
+    <div class="top"></div>
+    <div class="wrap">
+      <header class="nav">
+        <div class="brand">⌘ gohj99 - GitHub 镜像站</div>
+        <a href="https://github.gohj99.site/">进入镜像主站 ↗</a>
+      </header>
+      <main>
+        <section class="hero">
+          <div class="eyebrow">OPEN SOURCE · FAST ACCESS</div>
+          <h1>让 GitHub 访问<br />更简单一点</h1>
+          <p>
+            这是一个面向中文用户的 GitHub
+            镜像入口。输入仓库地址，或从下方常用入口开始浏览开源世界。
+          </p>
+          <form class="search" id="jump">
+            <input
+              id="url"
+              placeholder="输入仓库地址，例如 github.com/user/repo"
+            /><button>开始访问</button>
+          </form>
+          <div class="hint">
+            请求将跳转至 github.gohj99.site · 支持仓库、Issue、Release 等页面
+          </div>
+        </section>
+        <section class="grid">
+          <a class="card" href="https://github.gohj99.site/"
+            ><div>⌂</div>
+            <strong>镜像主站</strong><span>浏览 GitHub 首页与公开仓库</span></a
+          ><a class="card" href="https://github.gohj99.site/explore"
+            ><div>◈</div>
+            <strong>发现项目</strong><span>探索热门项目与开源趋势</span></a
+          ><a class="card" href="https://github.gohj99.site/topics"
+            ><div>#</div>
+            <strong>主题广场</strong><span>按技术主题查找优质仓库</span></a
+          >
+        </section>
+        <div class="notice">
+          本站仅提供公开内容的访问加速，不存储或修改 GitHub 数据。请遵守 GitHub 服务条款及当地法律法规。
+        </div>
+      </main>
+      <footer class="footer">
+        <span>© 2026 GitHub 镜像站 · githubproxy.gohj99.site</span
+        ><a href="https://github.gohj99.site/">github.gohj99.site ↗</a>
+      </footer>
+    </div>
+    <script>
+      document.getElementById("jump").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var v = document.getElementById("url").value.trim();
+        if (!v) return;
+        v = v.replace(/^https?:\/\/(www\.)?github\.com/i, "");
+        if (v.charAt(0) != "/") v = "/" + v;
+        location.href = "https://github.gohj99.site" + v;
+      });
+    </script>
+  </body>
 </html>
