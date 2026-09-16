@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://githubproxy.gohj99.site/sitemap.xml

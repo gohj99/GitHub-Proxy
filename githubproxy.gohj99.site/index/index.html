@@ -8,6 +8,7 @@
       name="description"
       content="gohj99 - GitHub 镜像站，提供稳定、快速的 GitHub 网页、仓库与资源访问入口。输入 GitHub 链接即可开始。"
     />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
     <meta
       name="keywords"
       content="GitHub镜像, GitHub加速, GitHub代理, GitHub访问, GitHub资源, GitHub仓库, GitHub开源, GitHub网页, GitHub入口, gohj99"
@@ -18,6 +19,25 @@
       property="og:description"
       content="快速访问 GitHub 仓库、代码和开源资源。"
     />
+    <meta property="og:url" content="https://githubproxy.gohj99.site/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="gohj99 GitHub 镜像站" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="GitHub 镜像站" />
+    <meta
+      name="twitter:description"
+      content="快速访问 GitHub 仓库、代码和开源资源。"
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "gohj99 GitHub 镜像站",
+        "url": "https://githubproxy.gohj99.site/",
+        "description": "提供 GitHub 公开网页、仓库与资源访问入口的镜像站。",
+        "inLanguage": "zh-CN"
+      }
+    </script>
     <style>
       body {
         margin: 0;
@@ -184,11 +204,11 @@
           <form class="search" id="jump">
             <input
               id="url"
-              placeholder="输入仓库地址，例如 github.com/user/repo"
+              placeholder="输入 GitHub 链接"
             /><button>开始访问</button>
           </form>
           <div class="hint">
-            请求将跳转至 github.gohj99.site · 支持仓库、Issue、Release 等页面
+            在本站地址后添加 GitHub 链接，即可跳转到相应加速页面。
           </div>
         </section>
         <section class="grid">
@@ -208,8 +228,7 @@
         </div>
       </main>
       <footer class="footer">
-        <span>© 2026 GitHub 镜像站 · githubproxy.gohj99.site</span
-        ><a href="https://github.gohj99.site/">github.gohj99.site ↗</a>
+        <span>© 2026 gohj99 - GitHub 镜像站 · githubproxy.gohj99.site & github.gohj99.site</span>
       </footer>
     </div>
     <script>
@@ -217,9 +236,8 @@
         e.preventDefault();
         var v = document.getElementById("url").value.trim();
         if (!v) return;
-        v = v.replace(/^https?:\/\/(www\.)?github\.com/i, "");
-        if (v.charAt(0) != "/") v = "/" + v;
-        location.href = "https://github.gohj99.site" + v;
+        if (!/^https?:\/\//i.test(v)) v = "https://" + v;
+        location.href = "https://githubproxy.gohj99.site/" + v;
       });
     </script>
   </body>
