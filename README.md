@@ -8,6 +8,6 @@
 
 ## EdgeOne 边缘函数
 
-可直接粘贴部署的单文件：[edge-function.js](github.gohj99.site/edge-function.js)。使用站点边缘函数的 `addEventListener("fetch", ...)` 入口，已内嵌现有 robots、内容拦截脚本和拦截页面，无需运行时依赖。
+可直接粘贴部署的单文件：[edge-function.js](github.gohj99.site/edge-function.js)。使用站点边缘函数的 `addEventListener("fetch", ...)` 入口；robots、内容拦截页面和拦截脚本均由站点源站特异性回源，不经过函数处理。
 
 具体域名、部署步骤、缓存策略和平台差异见 [部署说明](github.gohj99.site/EDGEONE.md)。

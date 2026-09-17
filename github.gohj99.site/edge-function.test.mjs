@@ -142,16 +142,13 @@ test("Nginx path denials, decoding, ACME priority, and unknown Host", async () =
   assert.equal(h.calls.length, 0);
 });
 
-test("bundled local assets match disk on every host; absent homepage falls back upstream", async () => {
+test("site-owned robots, blocked page, hook and ACME paths all use origin Passthrough", async () => {
   const h = harness();
-  for (const path of ["/robots.txt", "/static/content-blocked.html"]) {
-    const expected = await readFile(new URL("index" + path, root), "utf8");
-    for (const host of ["github.gohj99.site", "docs.github.gohj99.site", "gist.github.gohj99.site"]) {
-      assert.equal((await h.dispatch(`https://${host}${path}`)).text, expected);
+  for (const host of ["github.gohj99.site", "docs.github.gohj99.site", "raw.github.gohj99.site"]) {
+    for (const path of ["/robots.txt", "/static/content-blocked.html", "/static/github-hook.js", "/.well-known/acme-challenge/token"]) {
+      assert.equal((await h.dispatch(`https://${host}${path}`)).passthrough, true, `${host}${path}`);
     }
   }
-  assert.equal((await h.dispatch("https://github.gohj99.site/static/github-hook.js")).passthrough, true);
-  assert.equal((await h.dispatch("https://raw.github.gohj99.site/static/github-hook.js")).passthrough, true);
   assert.equal(h.calls.length, 0);
   await h.dispatch(main + "/");
   assert.equal(h.calls.at(-1).url, "https://github.com/");

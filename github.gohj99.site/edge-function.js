@@ -3,7 +3,6 @@
  * Paste this entire file into the function editor; no imports or bindings.
  * Source rules: proxy/root.conf and conf/00-ghproxy-global.conf.
  * Runtime: https://cloud.tencent.com/document/product/1552/81344
- * Refresh embedded index files: node github.gohj99.site/build-edge-assets.mjs
  */
 "use strict";
 
@@ -40,21 +39,6 @@ const HOST_CHARACTER = /[a-z\d_.-]/i;
 const ENCODER = new TextEncoder();
 const MAX_CACHE_BYTES = 8 * 1024 * 1024;
 const CACHE_TTL = { 200: 600, 301: 3600, 404: 60, 403: 30 };
-
-// BEGIN GENERATED LOCAL ASSETS
-const LOCAL_ASSETS = {
-  "/robots.txt": {
-    "type": "text/plain; charset=utf-8",
-    "base64": false,
-    "body": "User-agent: Amazonbot\r\nUser-agent: SemrushBot\r\nUser-agent: GPTBot\r\nUser-agent: DataForSeoBot\r\nUser-agent: MJ12bot\r\nUser-agent: AhrefsBot\r\nUser-agent: DotBot\r\nUser-agent: SogouBot\r\nUser-agent: Exabot\r\nUser-agent: ia_archiver\r\nUser-agent: meta-externalagent\r\nUser-agent: BacklinksExtendedBot\r\nUser-agent: ClaudeBot\r\nDisallow: /"
-  },
-  "/static/content-blocked.html": {
-    "type": "text/html; charset=utf-8",
-    "base64": false,
-    "body": "<!doctype html>\n<html lang=\"zh-CN\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>\u6b64\u9875\u9762\u65e0\u6cd5\u8bbf\u95ee</title>\n    <style>\n      :root { color-scheme: light; }\n      * { box-sizing: border-box; }\n      html, body { width: 100%; height: 100%; margin: 0; }\n      body {\n        display: grid;\n        place-items: center;\n        padding: 24px;\n        overflow: hidden;\n        background: #f6f8fa;\n        color: #1f2328;\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n      }\n      .message { width: min(520px, 100%); text-align: center; }\n      .icon {\n        width: 48px;\n        height: 48px;\n        margin: 0 auto 20px;\n        display: grid;\n        place-items: center;\n        border-radius: 50%;\n        background: #cf222e;\n        color: #fff;\n        font-size: 28px;\n        font-weight: 700;\n        line-height: 1;\n      }\n      h1 { margin: 0 0 12px; font-size: 24px; line-height: 1.35; font-weight: 600; }\n      p { margin: 0; color: #59636e; font-size: 15px; line-height: 1.7; }\n    </style>\n  </head>\n  <body>\n    <main class=\"message\" role=\"alert\" aria-live=\"assertive\">\n      <div class=\"icon\" aria-hidden=\"true\">!</div>\n      <h1>\u6b64\u9875\u9762\u65e0\u6cd5\u8bbf\u95ee</h1>\n      <p>\u9875\u9762\u5185\u5bb9\u4e0d\u7b26\u5408\u672c\u7ad9\u5185\u5bb9\u5b89\u5168\u89c4\u5219\u3002</p>\n    </main>\n  </body>\n</html>\n"
-  }
-};
-// END GENERATED LOCAL ASSETS
 
 function own(object, key) {
   return Object.prototype.hasOwnProperty.call(object, key);
@@ -347,17 +331,6 @@ async function handleRequest(event, url, path) {
     if (!match || !own(PROXY_HOSTS, match[1].toLowerCase())) return simpleResponse(request, 404, "Not Found");
     return new Response(null, { status: 301, headers: { Location: "https://" + PROXY_HOSTS[match[1].toLowerCase()] + (match[2] || "/") + url.search } });
   }
-  const assetPath = path === "/" && url.hostname === MAIN_HOST ? "/index.html" : path;
-  // This script is deliberately served by the configured origin. It can be
-  // updated independently and must never be cached or rewritten here.
-  if (own(LOCAL_ASSETS, assetPath)) {
-    const asset = LOCAL_ASSETS[assetPath];
-    if (!["GET", "HEAD"].includes(request.method)) return simpleResponse(request, 405, "Method Not Allowed", { Allow: "GET, HEAD" });
-    const body = asset.base64 ? Uint8Array.from(atob(asset.body), (char) => char.charCodeAt(0)) : asset.body;
-    return new Response(request.method === "HEAD" ? null : body, {
-      headers: { "Content-Type": asset.type, "Cache-Control": "public, max-age=300, must-revalidate", "Content-Security-Policy": CSP },
-    });
-  }
   if (request.headers.get("upgrade")) return simpleResponse(request, 501, "WebSocket upgrades are not supported by this Edge Function");
   return proxyRequest(event, url, path);
 }
@@ -372,11 +345,11 @@ addEventListener("fetch", (event) => {
     event.respondWith(simpleResponse(event.request, 400, "Bad Request"));
     return;
   }
-  // ACME remains with the configured origin, matching Nginx's ^~ priority.
-  if (own(HOSTS, url.hostname) && path.startsWith("/.well-known/acme-challenge/")) return;
-  // Keep the policy hook on the configured origin so it can be updated
-  // independently and is never transformed or cached by this function.
-  if (own(HOSTS, url.hostname) && path === "/static/github-hook.js") return;
+  // These site-owned files are handled by explicit EdgeOne origin rules.
+  // Returning without respondWith() is the documented Passthrough behavior.
+  if (own(HOSTS, url.hostname) && (path === "/robots.txt" ||
+      path === "/static/content-blocked.html" || path === "/static/github-hook.js" ||
+      path.startsWith("/.well-known/acme-challenge/"))) return;
   event.respondWith(handleRequest(event, url, path).catch((error) => {
     console.error("GitHub proxy upstream failure:", error.name || "Error");
     return simpleResponse(event.request, 502, "Bad Gateway");

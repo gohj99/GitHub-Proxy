@@ -29,17 +29,9 @@
 
 ## 本地文件
 
-`robots.txt`、`static/content-blocked.html` 已按当前本地文件内容内嵌。`static/github-hook.js` 特意不内嵌：所有已配置代理域名请求这个路径都会 Passthrough，由对应站点源站特异性回源，便于你单独更新脚本且不受边缘函数缓存或正文改写影响。HTML 的 `<head>` 起始位置仍会加载该路径；内容规则保持原文件内容。
+`robots.txt`、`static/content-blocked.html` 和 `static/github-hook.js` 都不经过这个函数。所有已配置代理域名请求这三个路径都会 Passthrough，由对应站点源站特异性回源，便于单独更新文件且不受边缘函数缓存或正文改写影响。HTML 的 `<head>` 起始位置仍会加载 `static/github-hook.js`。
 
-当前 `github.gohj99.site/index/` 没有 `index.html` 或 `favicon.ico`，所以 `/` 和 `/favicon.ico` 按 Nginx 的文件不存在回退逻辑访问 GitHub。入口站 `githubproxy.gohj99.site` 的首页不属于本函数。如以后在主站 `index/` 下添加首页或 favicon，重新运行下方打包命令即可纳入单文件；只有主站的 `/` 会使用首页。
-
-修改 `robots.txt` 或 `content-blocked.html` 后，在仓库根目录运行并重新部署生成的 `edge-function.js`：
-
-```powershell
-node github.gohj99.site/build-edge-assets.mjs
-```
-
-`/.well-known/acme-challenge/` 保持 Passthrough，由配置的源站提供证书验证文件，优先级与原来的 Nginx `^~` 规则一致。若使用 EdgeOne 托管证书而不需要 1Panel ACME，此路径不会影响普通代理请求。
+当前 `github.gohj99.site/index/` 没有 `index.html` 或 `favicon.ico`，所以 `/` 和 `/favicon.ico` 按 Nginx 的文件不存在回退逻辑访问 GitHub。入口站 `githubproxy.gohj99.site` 的首页不属于本函数。修改这三个文件后只需更新站点源站文件，不需要重新部署函数。
 
 ## 代理和替换
 
@@ -65,11 +57,10 @@ HTML、CSS、JavaScript、JSON 采用流式域名替换，并处理跨块域名�
 
 ```powershell
 node --check github.gohj99.site/edge-function.js
-node github.gohj99.site/build-edge-assets.mjs --check
 node --test github.gohj99.site/edge-function.test.mjs
 ```
 
-测试覆盖 16 个回源 Host、Gist raw、重定向查询参数、路径拦截、内嵌文件、凭据、跨块替换、超过 1 MB 的正文、gzip、附件/Range/GHCR 字节一致性、无响应体状态码及缓存隔离。已在本地用真实 GitHub 请求验证仓库页面、静态脚本、API、Raw 均返回 200；尚未在用户的 EdgeOne 账户内发布或验证节点行为。
+测试覆盖 16 个回源 Host、Gist raw、重定向查询参数、路径拦截、源站 Passthrough、凭据、跨块替换、超过 1 MB 的正文、gzip、附件/Range/GHCR 字节一致性、无响应体状态码及缓存隔离。已在本地用真实 GitHub 请求验证仓库页面、静态脚本、API、Raw 均返回 200；尚未在用户的 EdgeOne 账户内发布或验证节点行为。
 
 部署后可访问 `https://github.gohj99.site/microsoft/vscode`，检查 Network 面板内的 `assets.github.gohj99.site` 等资源，再用 `https://github.gohj99.site/https://github.com/microsoft/vscode` 检查 301。ACME 如需续签，需另确认对应源站能返回验证文件。
 
