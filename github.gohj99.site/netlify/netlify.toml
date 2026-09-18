@@ -1,0 +1,5 @@
+[build]
+  # Use github.gohj99.site as the Netlify site base directory.
+  publish = "index"
+  edge_functions = "edge-functions"
+
