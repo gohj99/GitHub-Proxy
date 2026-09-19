@@ -1,0 +1,8 @@
+{
+  "name": "github-proxy-vercel-edge",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}

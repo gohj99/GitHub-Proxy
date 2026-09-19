@@ -11,3 +11,7 @@
 可直接粘贴部署的单文件：[edge-function.js](github.gohj99.site/edge-function.js)。使用站点边缘函数的 `addEventListener("fetch", ...)` 入口；robots、内容拦截页面和拦截脚本均由站点源站特异性回源，不经过函数处理。
 
 具体域名、部署步骤、缓存策略和平台差异见 [部署说明](github.gohj99.site/EDGEONE.md)。
+
+## 阿里云 ESA 函数
+
+同一套 GitHub 代理规则的阿里云 ESA Functions 版本位于 [`github.gohj99.site/ESA/edge-function.js`](github.gohj99.site/ESA/edge-function.js)，使用 ESA 官方的 `export default { fetch(request) {} }` 入口。部署和 ESA Runtime API 差异见 [`ESA.md`](github.gohj99.site/ESA/ESA.md)。

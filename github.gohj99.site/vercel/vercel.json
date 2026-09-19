@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "routes": [
+    { "handle": "filesystem" },
+    {
+      "src": "/(?<proxyPath>.*)",
+      "transforms": [
+        {
+          "type": "request.path",
+          "op": "set",
+          "args": "/$proxyPath"
+        }
+      ],
+      "dest": "/api/proxy.js"
+    }
+  ]
+}
