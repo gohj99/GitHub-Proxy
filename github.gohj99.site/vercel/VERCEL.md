@@ -38,8 +38,10 @@ Vercel 自动生成的 `*.vercel.app` 域名不在代理 Host 白名单内，访
 
 - 使用标准 `export default (request) => Response` 入口和 `runtime: "edge"`，不依赖 EdgeOne 的
   `addEventListener`、`request.eo`、超时选项或命名 Cache API。
-- `vercel.json` 先匹配 `public/` 静态文件，再把其他路径交给边缘函数；官方
-  `request.path` transform 让函数继续看到原始 pathname，查询字符串不会被解析或重组。
+- `vercel.json` 先匹配 `public/` 静态文件，再用标准 catch-all 路由把其他路径交给边缘函数；
+  函数从 Web Standard `Request.url` 读取原始 pathname 和查询字符串。
+- Vercel 的直接函数入口 `/api/proxy` 会映射到当前域名对应的上游根路径，便于在只绑定一个
+  自定义域名时先验证部署。
 - 安全的公开响应通过 `Vercel-CDN-Cache-Control` 设置 CDN TTL；API、GHCR、Gist、签名参数、
   Range 和可变 codeload refs 均为 `no-store`。API/GHCR 整体不缓存是有意的安全收紧，防止
   Vercel 的共享 CDN 缓存混用匿名响应与带凭据请求。CDN 是否命中可查看响应头

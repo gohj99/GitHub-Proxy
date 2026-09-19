@@ -99,6 +99,9 @@ function stripHopHeaders(headers) {
 function requestHeaders(request, url) {
   const headers = new Headers(request.headers);
   stripHopHeaders(headers);
+  for (const name of [...headers.keys()]) {
+    if (name.startsWith("x-vercel-")) headers.delete(name);
+  }
   // Fetch sets Host from the upstream URL. Edge runtimes do not permit code
   // to override this forbidden header reliably.
   headers.delete("host");
@@ -183,7 +186,15 @@ async function fetchUpstream(request, url, upstreamHost) {
 
   const init = { method: request.method, headers, redirect: "manual" };
   if (!["GET", "HEAD"].includes(request.method)) init.body = request.body;
-  return fetch(upstream.href, init);
+  const response = await fetch(upstream.href, init);
+  if (response.status >= 400) {
+    console.warn("GitHub proxy upstream response", {
+      status: response.status,
+      upstreamHost,
+      pathname: upstream.pathname,
+    });
+  }
+  return response;
 }
 
 function responseHeaders(response, request, url, bypass) {
@@ -349,6 +360,11 @@ export default async function handler(request) {
   let path;
   try {
     url = new URL(request.url);
+    // Direct function URLs are useful before the catch-all route is verified.
+    // Treat the function endpoint itself as the selected upstream's root.
+    if (url.pathname === "/api/proxy" || url.pathname === "/api/proxy.js") {
+      url.pathname = "/";
+    }
     path = normalizedPath(url);
   } catch (_) {
     return simpleResponse(request, 400, "Bad Request");

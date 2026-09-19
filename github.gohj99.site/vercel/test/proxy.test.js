@@ -63,6 +63,12 @@ test("maps every proxy host to the intended HTTPS upstream", async () => {
   }
 });
 
+test("maps the direct Vercel function endpoint to the upstream root", async () => {
+  const result = await run(() => fixture(), "https://docs.github.gohj99.site/api/proxy");
+  const upstream = new URL(result.calls[0].url);
+  assert.equal(upstream.href, "https://docs.github.com/");
+});
+
 test("routes gist raw URLs to gist.githubusercontent.com", async () => {
   const result = await run(() => fixture(), "https://gist.github.gohj99.site/user/id/raw/rev/file.js");
   assert.equal(new URL(result.calls[0].url).hostname, "gist.githubusercontent.com");
@@ -100,6 +106,8 @@ test("forwards credentials only to API and GHCR according to policy", async () =
         origin: main,
         referer: main + "/owner/repo",
         "content-type": "application/json",
+        "x-vercel-deployment-url": "internal.vercel.app",
+        "x-vercel-oidc-token": "secret-platform-token",
       },
     });
     const headers = result.calls[0].init.headers;
@@ -107,6 +115,8 @@ test("forwards credentials only to API and GHCR according to policy", async () =
     assert.equal(headers.get("cookie"), key === "api" ? "session=example" : null);
     assert.equal(headers.get("origin"), "https://github.com");
     assert.equal(headers.get("referer"), "https://github.com/owner/repo");
+    assert.equal(headers.get("x-vercel-deployment-url"), null);
+    assert.equal(headers.get("x-vercel-oidc-token"), null);
   }
 });
 
