@@ -315,8 +315,12 @@
       let marked = false;
       try {
         const request = input instanceof Request ? input : null;
-        const method = String(init?.method ?? request?.method ?? "GET").toUpperCase();
-        const headers = new Headers(init?.headers !== undefined ? init.headers : request?.headers);
+        const initMethod = init && init.method !== undefined ? init.method : undefined;
+        const requestMethod = request && request.method !== undefined ? request.method : undefined;
+        const method = String(initMethod !== undefined ? initMethod : (requestMethod !== undefined ? requestMethod : "GET")).toUpperCase();
+        const initHeaders = init && init.headers !== undefined ? init.headers : undefined;
+        const requestHeaders = request && request.headers !== undefined ? request.headers : undefined;
+        const headers = new Headers(initHeaders !== undefined ? initHeaders : requestHeaders);
         if ((method === "GET" || method === "HEAD") && acceptsJSON(headers.get("Accept"))) {
           const url = new URL(request ? request.url : input, document.baseURI || window.location.href);
           if (url.origin === window.location.origin) {
