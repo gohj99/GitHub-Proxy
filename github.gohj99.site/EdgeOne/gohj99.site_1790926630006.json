@@ -941,7 +941,7 @@
                       }
                     }
                   ],
-                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} matches '^/(?:[^/]+/)*[^/.]+/?$' and ${http.request.headers['Accept']} matches '(?i)(?:^|,)\\\\s*(?:text/html|application/xhtml\\\\+xml)(?:\\\\s*;[^,]*)?(?:,|$)' and not lower(${http.request.headers['x-requested-with']}) in ['XMLHttpRequest'] and not lower(${http.request.headers['x-github-app-type']}) in ['dataRouter'] and not lower(${http.request.headers['Accept']}) in ['application/json']"
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} matches '^/(?:[^/]+/)*[^/.]+/?$' and ${http.request.headers['Accept']} matches '(?i)(?:^|,)\\\\s*(?:text/html|application/xhtml\\\\+xml)(?:\\\\s*;[^,]*)?(?:,|$)'"
                 },
                 {
                   "Actions": [
@@ -991,6 +991,27 @@
                     {
                       "CacheParameters": {
                         "CustomTime": {
+                          "CacheTime": 1200,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    },
+                    {
+                      "Name": "OfflineCache",
+                      "OfflineCacheParameters": {
+                        "Switch": "on"
+                      }
+                    }
+                  ],
+                  "Condition": "${http.request.headers['Accept']} matches '(?i)(?:^|,)\\\\s*application/json(?:\\\\s*;[^,]*)?(?:,|$)' and ${http.request.uri.args['__ghproxy_format']} in ['json']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
                           "CacheTime": 30,
                           "IgnoreCacheControl": "on",
                           "Switch": "on"
@@ -999,7 +1020,7 @@
                       "Name": "Cache"
                     }
                   ],
-                  "Condition": "not ${http.request.headers['Accept']} matches '(?i)(?:^|,)\\\\s*application/json(?:\\\\s*;[^,]*)?(?:,|$)'"
+                  "Condition": "not ${http.request.headers['host']} in ['api.github.gohj99.site']"
                 }
               ]
             }
@@ -1552,7 +1573,7 @@
     },
     "CachePrefresh": {
       "CacheTimePercent": 90,
-      "Switch": "on"
+      "Switch": "off"
     },
     "ClientIPCountry": {
       "Switch": "off"
