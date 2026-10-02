@@ -108,7 +108,7 @@
                       "Name": "HttpResponse"
                     }
                   ],
-                  "Condition": "${http.request.headers['User-Agent']} matches '(?i)(Googlebot|Google-InspectionTool|GoogleOther(?:-Image|-Video)?|Google-CloudVertexBot|bingbot|msnbot|BingPreview|MicrosoftPreview|BingVideoPreview|AdIdxBot|Baiduspider|YisouSpider|Sogou|360Spider|HaosouSpider|YandexBot|DuckDuckBot|Applebot|PetalBot|Bytespider|Qwantify|SeznamBot|Exabot|ia_archiver|archive.org_bot|heritrix|GPTBot|OAI-SearchBot|ChatGPT-User|ClaudeBot|Claude-SearchBot|Claude-User|anthropic-ai|PerplexityBot|Perplexity-User|meta-externalagent|meta-webindexer|Meta-ExternalFetcher|facebookexternalhit|Facebot|Amazonbot|SemrushBot(?:-SA)?|AhrefsBot|MJ12bot|DotBot|DataForSeoBot|BLEXBot|SerpstatBot|SeobilityBot|SiteAuditBot|Screaming Frog SEO Spider|rogerbot|MegaIndex|linkdexbot|SISTRIX|BacklinksExtendedBot|Twitterbot|LinkedInBot|Discordbot|TelegramBot|Slackbot|WhatsApp|Pinterestbot|redditbot|SkypeUriPreview)' or not ${http.request.headers['User-Agent']} exists"
+                  "Condition": "${http.request.headers['User-Agent']} matches '(?i)(Googlebot|Google-InspectionTool|GoogleOther(?:-Image|-Video)?|Google-CloudVertexBot|bingbot|msnbot|BingPreview|MicrosoftPreview|BingVideoPreview|AdIdxBot|Baiduspider|YisouSpider|Sogou|360Spider|HaosouSpider|YandexBot|DuckDuckBot|Applebot|PetalBot|Bytespider|Qwantify|SeznamBot|Exabot|ia_archiver|archive.org_bot|heritrix|GPTBot|OAI-SearchBot|ChatGPT-User|ClaudeBot|Claude-SearchBot|Claude-User|anthropic-ai|PerplexityBot|Perplexity-User|meta-externalagent|meta-webindexer|Meta-ExternalFetcher|facebookexternalhit|Facebot|Amazonbot|SemrushBot(?:-SA)?|AhrefsBot|MJ12bot|DotBot|DataForSeoBot|BLEXBot|SerpstatBot|SeobilityBot|SiteAuditBot|Screaming Frog SEO Spider|rogerbot|MegaIndex|linkdexbot|SISTRIX|BacklinksExtendedBot|Twitterbot|LinkedInBot|Discordbot|TelegramBot|Slackbot|WhatsApp|Pinterestbot|redditbot|SkypeUriPreview|Reflectionbot|Amzn-SearchBot|SERankingBacklinksBot|KeenableBot|Google-Extended|CCBot|Applebot-Extended|DuckAssistBot|MistralAI-User|FacebookBot)' and not ${http.request.uri.path} in ['/'] or not ${http.request.headers['User-Agent']} exists and not ${http.request.uri.path} in ['/']"
                 }
               ]
             },
@@ -124,7 +124,7 @@
                       "Name": "HttpResponse"
                     }
                   ],
-                  "Condition": "${http.request.ip.country} in ['KP']"
+                  "Condition": "${http.request.ip.country} in ['KP', 'RU', 'IR', 'IN', 'UA', 'Other Regions']"
                 }
               ]
             },
@@ -140,7 +140,7 @@
                       "Name": "HttpResponse"
                     }
                   ],
-                  "Condition": "not ${http.request.headers['host']} in ['github.gohj99.site', 'api.github.gohj99.site', 'raw.github.gohj99.site', 'camo.github.gohj99.site', 'docs.github.gohj99.site', 'gist.github.gohj99.site', 'assets.github.gohj99.site', 'avatars.github.gohj99.site', 'objects.github.gohj99.site', 'codeload.github.gohj99.site', 'ghcr.github.gohj99.site', 'gist-assets.github.gohj99.site', 'user-images.github.gohj99.site', 'private-user-images.github.gohj99.site', 'release-assets.github.gohj99.site', 'github-releases.github.gohj99.site']"
+                  "Condition": "not ${http.request.headers['host']} in ['github.gohj99.site', 'api.github.gohj99.site', 'raw.github.gohj99.site', 'camo.github.gohj99.site', 'docs.github.gohj99.site', 'gist.github.gohj99.site', 'assets.github.gohj99.site', 'avatars.github.gohj99.site', 'objects.github.gohj99.site', 'codeload.github.gohj99.site', 'ghcr.github.gohj99.site', 'gist-assets.github.gohj99.site', 'user-images.github.gohj99.site', 'private-user-images.github.gohj99.site', 'release-assets.github.gohj99.site', 'github-releases.github.gohj99.site'] or ${http.request.host} in ['github.gohj99.site'] and lower(${http.request.uri.path}) in ['/login', '/login/*', '/signup', '/signup/*', '/copilot', '/copilot/*', '/bannedbook', '/bannedbook/*'] or ${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} matches '//' or ${http.request.uri.path} in ['/_private/browser/stats']"
                 }
               ]
             }
@@ -863,6 +863,206 @@
     {
       "Branches": [
         {
+          "Condition": "${http.request.host} in ['*.github.gohj99.site', 'github.gohj99.site']",
+          "SubRules": [
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "og-3vni86rrqgtz@zone-3v5iy4p4cq0s",
+                        "OriginProtocol": "https",
+                        "OriginType": "OriginGroup"
+                      },
+                      "Name": "ModifyOrigin"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['api.github.gohj99.site']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "163.192.26.203",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 30,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/server-3.md']"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "magical-faun-12e6f9.netlify.app",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 5,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/netlify.md']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "github.gohj99.site.a1.initaa.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 5,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/esa.md']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "alias.deno.net",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 5,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and lower(${http.request.uri.path}) in ['/gohj99/GitHub-Proxy/blob/master/test/deno.md']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "9d23bb0817e1f7b5.vercel-dns-017.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 5,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/vercel.md']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "104.249.156.202",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 30,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/server-1.md']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "155.248.194.52",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 30,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/server-2.md']"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "RuleName": "GP-Origin-Group-Selection"
+    },
+    {
+      "Branches": [
+        {
           "Actions": [
             {
               "Name": "StatusCodeCache",
@@ -1122,232 +1322,6 @@
         }
       ],
       "RuleName": "GHProxy-Other-Cache-Configuration"
-    },
-    {
-      "Branches": [
-        {
-          "Condition": "${http.request.host} in ['github.gohj99.site', '*.github.gohj99.site']",
-          "SubRules": [
-            {
-              "Branches": [
-                {
-                  "Actions": [
-                    {
-                      "HttpResponseParameters": {
-                        "ResponsePage": "p-3v89u7d7ty1b",
-                        "StatusCode": 404
-                      },
-                      "Name": "HttpResponse"
-                    }
-                  ],
-                  "Condition": "lower(${http.request.uri.path}) in ['/login', '/login/*', '/signup', '/signup/*', '/copilot', '/copilot/*', '/bannedbook', '/bannedbook/*'] and ${http.request.host} in ['github.gohj99.site']"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "RuleName": "Ban-Path"
-    },
-    {
-      "Branches": [
-        {
-          "Condition": "${http.request.host} in ['*.github.gohj99.site', 'github.gohj99.site']",
-          "SubRules": [
-            {
-              "Branches": [
-                {
-                  "Actions": [
-                    {
-                      "ModifyOriginParameters": {
-                        "HTTPSOriginPort": 443,
-                        "Origin": "og-3vni86rrqgtz@zone-3v5iy4p4cq0s",
-                        "OriginProtocol": "https",
-                        "OriginType": "OriginGroup"
-                      },
-                      "Name": "ModifyOrigin"
-                    }
-                  ],
-                  "Condition": "lower(${http.request.headers['host']}) in ['api.github.gohj99.site']"
-                },
-                {
-                  "Actions": [
-                    {
-                      "ModifyOriginParameters": {
-                        "HTTPSOriginPort": 443,
-                        "Origin": "163.192.26.203",
-                        "OriginProtocol": "https",
-                        "OriginType": "IPDomain"
-                      },
-                      "Name": "ModifyOrigin"
-                    },
-                    {
-                      "CacheParameters": {
-                        "CustomTime": {
-                          "CacheTime": 30,
-                          "IgnoreCacheControl": "on",
-                          "Switch": "on"
-                        }
-                      },
-                      "Name": "Cache"
-                    }
-                  ],
-                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/server-3.md']"
-                }
-              ]
-            },
-            {
-              "Branches": [
-                {
-                  "Actions": [
-                    {
-                      "ModifyOriginParameters": {
-                        "HTTPSOriginPort": 443,
-                        "Origin": "magical-faun-12e6f9.netlify.app",
-                        "OriginProtocol": "https",
-                        "OriginType": "IPDomain"
-                      },
-                      "Name": "ModifyOrigin"
-                    },
-                    {
-                      "CacheParameters": {
-                        "CustomTime": {
-                          "CacheTime": 5,
-                          "IgnoreCacheControl": "on",
-                          "Switch": "on"
-                        }
-                      },
-                      "Name": "Cache"
-                    }
-                  ],
-                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/netlify.md']"
-                },
-                {
-                  "Actions": [
-                    {
-                      "ModifyOriginParameters": {
-                        "HTTPSOriginPort": 443,
-                        "Origin": "github.gohj99.site.a1.initaa.com",
-                        "OriginProtocol": "https",
-                        "OriginType": "IPDomain"
-                      },
-                      "Name": "ModifyOrigin"
-                    },
-                    {
-                      "CacheParameters": {
-                        "CustomTime": {
-                          "CacheTime": 5,
-                          "IgnoreCacheControl": "on",
-                          "Switch": "on"
-                        }
-                      },
-                      "Name": "Cache"
-                    }
-                  ],
-                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/esa.md']"
-                },
-                {
-                  "Actions": [
-                    {
-                      "ModifyOriginParameters": {
-                        "HTTPSOriginPort": 443,
-                        "Origin": "alias.deno.net",
-                        "OriginProtocol": "https",
-                        "OriginType": "IPDomain"
-                      },
-                      "Name": "ModifyOrigin"
-                    },
-                    {
-                      "CacheParameters": {
-                        "CustomTime": {
-                          "CacheTime": 5,
-                          "IgnoreCacheControl": "on",
-                          "Switch": "on"
-                        }
-                      },
-                      "Name": "Cache"
-                    }
-                  ],
-                  "Condition": "${http.request.host} in ['github.gohj99.site'] and lower(${http.request.uri.path}) in ['/gohj99/GitHub-Proxy/blob/master/test/deno.md']"
-                },
-                {
-                  "Actions": [
-                    {
-                      "ModifyOriginParameters": {
-                        "HTTPSOriginPort": 443,
-                        "Origin": "9d23bb0817e1f7b5.vercel-dns-017.com",
-                        "OriginProtocol": "https",
-                        "OriginType": "IPDomain"
-                      },
-                      "Name": "ModifyOrigin"
-                    },
-                    {
-                      "CacheParameters": {
-                        "CustomTime": {
-                          "CacheTime": 5,
-                          "IgnoreCacheControl": "on",
-                          "Switch": "on"
-                        }
-                      },
-                      "Name": "Cache"
-                    }
-                  ],
-                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/vercel.md']"
-                },
-                {
-                  "Actions": [
-                    {
-                      "ModifyOriginParameters": {
-                        "HTTPSOriginPort": 443,
-                        "Origin": "104.249.156.202",
-                        "OriginProtocol": "https",
-                        "OriginType": "IPDomain"
-                      },
-                      "Name": "ModifyOrigin"
-                    },
-                    {
-                      "CacheParameters": {
-                        "CustomTime": {
-                          "CacheTime": 30,
-                          "IgnoreCacheControl": "on",
-                          "Switch": "on"
-                        }
-                      },
-                      "Name": "Cache"
-                    }
-                  ],
-                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/server-1.md']"
-                },
-                {
-                  "Actions": [
-                    {
-                      "ModifyOriginParameters": {
-                        "HTTPSOriginPort": 443,
-                        "Origin": "155.248.194.52",
-                        "OriginProtocol": "https",
-                        "OriginType": "IPDomain"
-                      },
-                      "Name": "ModifyOrigin"
-                    },
-                    {
-                      "CacheParameters": {
-                        "CustomTime": {
-                          "CacheTime": 30,
-                          "IgnoreCacheControl": "on",
-                          "Switch": "on"
-                        }
-                      },
-                      "Name": "Cache"
-                    }
-                  ],
-                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/server-2.md']"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "RuleName": "GP-Origin-Group-Selection"
     }
   ],
   "WebSecurity": {
