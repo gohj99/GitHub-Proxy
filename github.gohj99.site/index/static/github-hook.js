@@ -469,8 +469,10 @@
   };
 
   const startContentGuard = () => {
+    // Immediate scan on start
     scanPage();
 
+    // Watch for DOM mutations
     const observer = new MutationObserver(scheduleScan);
     observer.observe(document.documentElement, {
       childList: true,
@@ -478,12 +480,40 @@
       characterData: true,
     });
 
+    // Watch for navigation events
     ["popstate", "hashchange", "pjax:end", "turbo:load"].forEach((eventName) => {
       window.addEventListener(eventName, scheduleScan);
     });
+
+    // Watch for input events in text fields
+    document.addEventListener("input", (event) => {
+      if (blocked) return;
+      const target = event.target;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
+        const value = normalizeText(target.value || "");
+        const match = normalizedBlockedTerms.find(
+          (term) => term.normalized && value.includes(term.normalized),
+        );
+        if (match) blockPage(match.original);
+      }
+    }, true);
   };
 
+  // Start immediately, even before DOMContentLoaded
   if (document.readyState === "loading") {
+    // Scan title and URL immediately
+    const earlyText = normalizeText([
+      window.location ? window.location.href : "",
+      document.title,
+    ].join("\n"));
+    const earlyMatch = normalizedBlockedTerms.find(
+      (term) => term.normalized && earlyText.includes(term.normalized),
+    );
+    if (earlyMatch) {
+      blocked = true;
+      window.location.replace("/static/content-blocked.html");
+    }
+
     document.addEventListener("DOMContentLoaded", startContentGuard, { once: true });
   } else {
     startContentGuard();

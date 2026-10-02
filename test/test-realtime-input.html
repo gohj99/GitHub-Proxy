@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Field Test Page</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+            line-height: 1.6;
+        }
+        .test-box {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #e1e4e8;
+            border-radius: 6px;
+            background: #f6f8fa;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #d0d7de;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #0969da;
+        }
+        .warning {
+            background: #fff8c5;
+            border: 2px solid #d4a72c;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .info {
+            background: #ddf4ff;
+            border: 2px solid #54aeff;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        code {
+            background: #e6edf3;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        button {
+            background: #cf222e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #a40e26;
+        }
+        #logs {
+            margin-top: 10px;
+            padding: 15px;
+            background: #24292e;
+            color: #e1e4e8;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin: 3px 0;
+            padding: 2px 0;
+            border-bottom: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Real-time Input Monitoring Test</h1>
+
+    <div class="info">
+        <strong>New Features:</strong>
+        <ul>
+            <li>Early scan of title and URL (before DOMContentLoaded)</li>
+            <li>Real-time input field monitoring</li>
+            <li>Instant blocking on detection</li>
+        </ul>
+    </div>
+
+    <div class="warning">
+        <strong>Warning:</strong> Typing blocked terms will instantly redirect!
+    </div>
+
+    <div class="test-box">
+        <h2>Test 1: Text Input</h2>
+        <p>Try typing: <code>8964</code></p>
+        <input type="text" id="test-input" placeholder="Type here..." autocomplete="off">
+    </div>
+
+    <div class="test-box">
+        <h2>Test 2: Textarea</h2>
+        <p>Try typing blocked terms:</p>
+        <textarea id="test-textarea" rows="5" placeholder="Type here..."></textarea>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 3: Dynamic Content</h2>
+        <p>Click to add blocked content (250ms scan delay):</p>
+        <button onclick="addBlockedContent()">Add Blocked Content</button>
+        <div id="dynamic-content"></div>
+    </div>
+
+    <div style="margin-top: 30px;">
+        <strong>Console Logs:</strong>
+        <div id="logs"></div>
+    </div>
+
+    <script src="github.gohj99.site/index/static/github-hook.min.js"></script>
+
+    <script>
+        const logsDiv = document.getElementById('logs');
+
+        function log(message) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.appendChild(entry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(message);
+        }
+
+        log('Page loaded successfully');
+        log('Hook installed: ' + (window[Symbol.for("GitHubProxy.jsonFetchHook")] === true));
+        log('Waiting for input...');
+
+        function addBlockedContent() {
+            log('Adding blocked content...');
+            const div = document.getElementById('dynamic-content');
+            div.innerHTML = '<p style="margin-top: 10px; color: #cf222e;">Content with term: 8964</p>';
+            log('Content added, waiting for scan (250ms delay)...');
+        }
+
+        document.getElementById('test-input').addEventListener('input', (e) => {
+            log('Input value: "' + e.target.value + '"');
+        });
+
+        document.getElementById('test-textarea').addEventListener('input', (e) => {
+            if (e.target.value) {
+                log('Textarea updated (length: ' + e.target.value.length + ')');
+            }
+        });
+    </script>
+</body>
+</html>

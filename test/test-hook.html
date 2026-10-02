@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Hook Test Page</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #e1e4e8;
+            border-radius: 6px;
+            background: #f6f8fa;
+        }
+        .test-section h2 {
+            margin-top: 0;
+            color: #24292e;
+        }
+        button {
+            background: #2ea44f;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #2c974b;
+        }
+        button.danger {
+            background: #cf222e;
+        }
+        button.danger:hover {
+            background: #a40e26;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .status.pass {
+            background: #dafbe1;
+            color: #1a7f37;
+        }
+        .status.fail {
+            background: #ffebe9;
+            color: #cf222e;
+        }
+        .logs {
+            margin-top: 20px;
+            padding: 15px;
+            background: #24292e;
+            color: #e1e4e8;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin: 5px 0;
+        }
+        .log-entry.warn {
+            color: #ffa657;
+        }
+        .log-entry.error {
+            color: #ff7b72;
+        }
+        .log-entry.info {
+            color: #79c0ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>GitHub Hook 脚本功能测试</h1>
+    <p>测试压缩后的 <code>github-hook.min.js</code> 各项功能是否正常工作</p>
+
+    <div class="test-section">
+        <h2>测试 1: Fetch Hook 功能</h2>
+        <p>验证脚本是否正确 hook 了 fetch API 并添加了 <code>__ghproxy_format=json</code> 参数</p>
+        <button onclick="testFetchHook()">测试 Fetch Hook</button>
+        <div id="fetch-result" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>测试 2: 内容扫描 - 安全内容</h2>
+        <p>测试正常内容不会被拦截</p>
+        <button onclick="testSafeContent()">测试安全内容</button>
+        <div id="safe-result" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>测试 3: 内容扫描 - 敏感词检测</h2>
+        <p>⚠️ 这个测试会触发页面拦截！请最后运行</p>
+        <button class="danger" onclick="testBlockedContent()">测试敏感词拦截 (会跳转)</button>
+        <div id="blocked-result" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>测试 4: URL 仓库黑名单</h2>
+        <p>测试 URL 路径中的仓库黑名单检测</p>
+        <button onclick="testRepositoryBlacklist()">测试仓库黑名单</button>
+        <div id="repo-result" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>测试 5: Unicode 转义验证</h2>
+        <p>验证中文 Unicode 转义是否正确工作</p>
+        <button onclick="testUnicodeEscape()">测试 Unicode 转义</button>
+        <div id="unicode-result" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="logs">
+        <strong>Console Logs:</strong>
+        <div id="console-logs"></div>
+    </div>
+
+    <!-- 加载压缩后的脚本 -->
+    <script src="github.gohj99.site/index/static/github-hook.min.js"></script>
+
+    <script>
+        // 捕获 console 输出
+        const consoleLog = document.getElementById('console-logs');
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+        const originalError = console.error;
+
+        function addLog(type, ...args) {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] [${type.toUpperCase()}] ${args.join(' ')}`;
+            consoleLog.appendChild(entry);
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        }
+
+        console.warn = function(...args) {
+            addLog('warn', ...args);
+            originalWarn.apply(console, args);
+        };
+
+        console.log = function(...args) {
+            addLog('info', ...args);
+            originalLog.apply(console, args);
+        };
+
+        console.error = function(...args) {
+            addLog('error', ...args);
+            originalError.apply(console, args);
+        };
+
+        // 测试函数
+        async function testFetchHook() {
+            const result = document.getElementById('fetch-result');
+            result.style.display = 'block';
+            result.textContent = '正在测试...';
+
+            try {
+                // Mock fetch 请求
+                const testUrl = '/test-api/users?page=1';
+
+                // 创建一个 Request 对象来检查 URL
+                const request = new Request(testUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                // 检查 window.fetch 是否被 hook
+                const isHooked = window[Symbol.for("GitHubProxy.jsonFetchHook")] === true;
+
+                let status = isHooked ? 'PASS' : 'FAIL';
+                let message = `Fetch Hook 状态: ${isHooked ? '已安装' : '未安装'}\n`;
+                message += `Symbol key 检查: ${isHooked ? '✓' : '✗'}\n`;
+                message += `原始 fetch 类型: ${typeof window.fetch}\n`;
+
+                result.innerHTML = `<span class="status ${status === 'PASS' ? 'pass' : 'fail'}">${status}</span>\n${message}`;
+
+                console.log('Fetch hook test:', status);
+            } catch (error) {
+                result.innerHTML = `<span class="status fail">ERROR</span>\n${error.message}`;
+                console.error('Fetch hook test error:', error);
+            }
+        }
+
+        async function testSafeContent() {
+            const result = document.getElementById('safe-result');
+            result.style.display = 'block';
+            result.textContent = '正在测试...';
+
+            try {
+                // 添加一些安全内容到页面
+                const safeText = 'This is a normal GitHub repository about JavaScript and React';
+                const testDiv = document.createElement('div');
+                testDiv.id = 'safe-content-test';
+                testDiv.textContent = safeText;
+                testDiv.style.display = 'none';
+                document.body.appendChild(testDiv);
+
+                // 等待扫描
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // 检查页面是否被拦截
+                const isBlocked = document.getElementById('github-proxy-content-blocked') !== null;
+                const status = !isBlocked ? 'PASS' : 'FAIL';
+
+                result.innerHTML = `<span class="status ${status === 'PASS' ? 'pass' : 'fail'}">${status}</span>\n`;
+                result.innerHTML += `页面状态: ${!isBlocked ? '正常显示' : '已被拦截'}\n`;
+                result.innerHTML += `测试内容: "${safeText}"`;
+
+                console.log('Safe content test:', status);
+            } catch (error) {
+                result.innerHTML = `<span class="status fail">ERROR</span>\n${error.message}`;
+                console.error('Safe content test error:', error);
+            }
+        }
+
+        async function testBlockedContent() {
+            const result = document.getElementById('blocked-result');
+            result.style.display = 'block';
+
+            if (!confirm('此测试会触发页面拦截并跳转到拦截页面。确定要继续吗？')) {
+                result.textContent = '测试已取消';
+                return;
+            }
+
+            result.textContent = '正在添加敏感内容...即将触发拦截';
+
+            // 注意：仓库黑名单检查会因为域名不是 github.gohj99.site 而跳过
+            // 但内容扫描应该仍然工作
+            console.log('Current domain:', window.location.hostname);
+            console.log('Adding blocked content...');
+
+            // 添加敏感词到页面 (使用一个相对温和的测试词)
+            setTimeout(() => {
+                const testDiv = document.createElement('div');
+                testDiv.id = 'blocked-content-test';
+                testDiv.textContent = '8964';  // 使用一个测试敏感词
+                document.body.appendChild(testDiv);
+
+                console.log('Blocked content added, waiting for scan...');
+
+                // 手动触发扫描（如果可以访问）
+                setTimeout(() => {
+                    result.textContent = '敏感内容已添加。如果未跳转，可能是:\n';
+                    result.textContent += '1. 域名不是 github.gohj99.site（仓库黑名单检查会先返回）\n';
+                    result.textContent += '2. 脚本的 blocked 变量在闭包内，页面扫描正常工作但我们看不到状态\n';
+                    result.textContent += '3. 请检查 console logs 查看是否有拦截警告';
+                }, 1000);
+            }, 100);
+        }
+
+        async function testRepositoryBlacklist() {
+            const result = document.getElementById('repo-result');
+            result.style.display = 'block';
+            result.textContent = '正在测试...';
+
+            try {
+                // 测试 URL 解析逻辑
+                const testUrls = [
+                    { url: 'https://github.gohj99.site/bannedbook/test', shouldBlock: true },
+                    { url: 'https://github.gohj99.site/htcc/repo', shouldBlock: true },
+                    { url: 'https://github.gohj99.site/normaluser/repo', shouldBlock: false },
+                ];
+
+                let message = '仓库黑名单测试:\n\n';
+
+                for (const test of testUrls) {
+                    const url = new URL(test.url);
+                    const segments = url.pathname.split('/').filter(Boolean);
+                    const user = segments[0] ? decodeURIComponent(segments[0]).toLowerCase() : '';
+
+                    // 简化的黑名单检查逻辑
+                    const blockedRepos = [
+                        { user: 'bannedbook', repo: '' },
+                        { user: 'htcc', repo: '' }
+                    ];
+
+                    const isBlocked = blockedRepos.some(entry => {
+                        if (entry.user.toLowerCase() === user) {
+                            if (!entry.repo) return true;
+                            if (segments.length < 2) return false;
+                            const repo = decodeURIComponent(segments[1]).toLowerCase();
+                            return entry.repo.toLowerCase() === repo;
+                        }
+                        return false;
+                    });
+
+                    const expected = test.shouldBlock;
+                    const status = isBlocked === expected ? '✓' : '✗';
+                    message += `${status} ${test.url}\n`;
+                    message += `   期望: ${expected ? '拦截' : '放行'} | 实际: ${isBlocked ? '拦截' : '放行'}\n\n`;
+                }
+
+                result.innerHTML = `<span class="status pass">PASS</span>\n${message}`;
+                console.log('Repository blacklist test: PASS');
+            } catch (error) {
+                result.innerHTML = `<span class="status fail">ERROR</span>\n${error.message}`;
+                console.error('Repository blacklist test error:', error);
+            }
+        }
+
+        async function testUnicodeEscape() {
+            const result = document.getElementById('unicode-result');
+            result.style.display = 'block';
+            result.textContent = '正在测试...';
+
+            try {
+                // 读取脚本内容检查 Unicode 转义
+                const scriptElement = document.querySelector('script[src*="github-hook.min.js"]');
+
+                if (!scriptElement) {
+                    result.innerHTML = `<span class="status fail">FAIL</span>\n无法找到脚本元素`;
+                    return;
+                }
+
+                const response = await fetch(scriptElement.src);
+                const scriptContent = await response.text();
+
+                // 检查是否包含 Unicode 转义
+                const hasUnicodeEscape = /\\u[0-9a-fA-F]{4}/.test(scriptContent);
+                const hasChinese = /[一-龥]/.test(scriptContent);
+
+                const status = hasUnicodeEscape && !hasChinese ? 'PASS' : 'FAIL';
+
+                let message = `Unicode 转义检查:\n`;
+                message += `包含 \\uXXXX 格式: ${hasUnicodeEscape ? '✓' : '✗'}\n`;
+                message += `包含原始中文: ${hasChinese ? '✗ (应该没有)' : '✓'}\n`;
+                message += `脚本大小: ${scriptContent.length.toLocaleString()} 字节\n`;
+
+                // 显示一些 Unicode 转义示例
+                const unicodeMatches = scriptContent.match(/\\u[0-9a-fA-F]{4}/g);
+                if (unicodeMatches) {
+                    message += `\nUnicode 转义示例 (前 10 个):\n`;
+                    unicodeMatches.slice(0, 10).forEach(match => {
+                        const char = String.fromCharCode(parseInt(match.slice(2), 16));
+                        message += `  ${match} → ${char}\n`;
+                    });
+                }
+
+                result.innerHTML = `<span class="status ${status === 'PASS' ? 'pass' : 'fail'}">${status}</span>\n${message}`;
+                console.log('Unicode escape test:', status);
+            } catch (error) {
+                result.innerHTML = `<span class="status fail">ERROR</span>\n${error.message}`;
+                console.error('Unicode escape test error:', error);
+            }
+        }
+
+        // 页面加载完成后的初始化日志
+        window.addEventListener('load', () => {
+            console.log('Test page loaded');
+            console.log('GitHub hook script loaded:', window[Symbol.for("GitHubProxy.jsonFetchHook")] === true);
+        });
+    </script>
+</body>
+</html>

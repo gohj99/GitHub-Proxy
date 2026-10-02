@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>输入框敏感词拦截测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+            line-height: 1.6;
+        }
+        .test-box {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #e1e4e8;
+            border-radius: 6px;
+            background: #f6f8fa;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #d0d7de;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #0969da;
+        }
+        .warning {
+            background: #fff8c5;
+            border: 2px solid #d4a72c;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .info {
+            background: #ddf4ff;
+            border: 2px solid #54aeff;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        code {
+            background: #e6edf3;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>实时输入监听测试</h1>
+
+    <div class="info">
+        <strong>✨ 新功能：</strong>
+        <ul>
+            <li>✅ 立即扫描页面标题和 URL（无需等待 DOMContentLoaded）</li>
+            <li>✅ 监听所有输入框的 <code>input</code> 事件</li>
+            <li>✅ 实时检测敏感词，无延迟</li>
+        </ul>
+    </div>
+
+    <div class="warning">
+        <strong>⚠️ 警告：</strong> 在下面的输入框中输入敏感词会立即触发页面拦截！
+    </div>
+
+    <div class="test-box">
+        <h2>测试 1: 文本输入框</h2>
+        <p>试试输入 <code>8964</code> 或其他敏感词：</p>
+        <input type="text" id="test-input" placeholder="在这里输入..." autocomplete="off">
+    </div>
+
+    <div class="test-box">
+        <h2>测试 2: 多行文本框</h2>
+        <p>试试输入 <code>六四事件</code>：</p>
+        <textarea id="test-textarea" rows="5" placeholder="在这里输入..."></textarea>
+    </div>
+
+    <div class="test-box">
+        <h2>测试 3: 动态添加内容</h2>
+        <p>点击按钮会动态添加包含敏感词的内容（250ms 延迟扫描）：</p>
+        <button onclick="addBlockedContent()" style="background: #cf222e; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+            添加敏感内容
+        </button>
+        <div id="dynamic-content"></div>
+    </div>
+
+    <div style="margin-top: 40px; padding: 20px; background: #24292e; color: #e1e4e8; border-radius: 6px; font-family: monospace; font-size: 13px;">
+        <strong>Console Logs:</strong>
+        <div id="logs"></div>
+    </div>
+
+    <!-- 加载压缩后的脚本 -->
+    <script src="github.gohj99.site/index/static/github-hook.min.js"></script>
+
+    <script>
+        const logsDiv = document.getElementById('logs');
+
+        function log(message) {
+            const entry = document.createElement('div');
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.appendChild(entry);
+            console.log(message);
+        }
+
+        log('Page loaded, hook installed: ' + (window[Symbol.for("GitHubProxy.jsonFetchHook")] === true));
+
+        function addBlockedContent() {
+            log('Adding blocked content dynamically...');
+            const div = document.getElementById('dynamic-content');
+            div.innerHTML = '<p>这是一段包含敏感词的内容：8964</p>';
+            log('Content added, waiting for scan...');
+        }
+
+        // 监听输入
+        document.getElementById('test-input').addEventListener('input', (e) => {
+            if (e.target.value) {
+                log('Input: ' + e.target.value);
+            }
+        });
+
+        document.getElementById('test-textarea').addEventListener('input', (e) => {
+            if (e.target.value) {
+                log('Textarea: ' + e.target.value);
+            }
+        });
+    </script>
+</body>
+</html>

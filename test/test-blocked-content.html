@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8964 天安门事件</title>
+    <meta name="description" content="这是一个包含敏感词的测试页面">
+</head>
+<body>
+    <h1>敏感词拦截测试</h1>
+    <p>如果脚本工作正常，这个页面应该被立即拦截并跳转到 /static/content-blocked.html</p>
+    <p>页面内容包含敏感词: 8964</p>
+
+    <div id="status">
+        <p>如果你看到这段文字，说明拦截没有生效。</p>
+        <p>可能的原因：</p>
+        <ul>
+            <li>脚本未正确加载</li>
+            <li>域名不是 github.gohj99.site（但内容扫描应该仍然工作）</li>
+            <li>敏感词规范化或匹配逻辑有问题</li>
+        </ul>
+    </div>
+
+    <script src="github.gohj99.site/index/static/github-hook.min.js"></script>
+
+    <script>
+        // 检查脚本是否加载
+        console.log('Page loaded');
+        console.log('Hook installed:', window[Symbol.for("GitHubProxy.jsonFetchHook")] === true);
+        console.log('Current URL:', window.location.href);
+        console.log('Domain:', window.location.hostname);
+
+        setTimeout(() => {
+            if (document.getElementById('status')) {
+                console.warn('Page was NOT blocked after 2 seconds');
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
