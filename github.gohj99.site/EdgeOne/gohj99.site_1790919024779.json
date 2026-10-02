@@ -1,0 +1,1634 @@
+﻿{
+  "FormatVersion": "1.0",
+  "Rules": [
+    {
+      "Branches": [
+        {
+          "Actions": [
+            {
+              "ModifyOriginParameters": {
+                "HTTPSOriginPort": 443,
+                "Origin": "cloudflare-dns.com",
+                "OriginProtocol": "https",
+                "OriginType": "IPDomain"
+              },
+              "Name": "ModifyOrigin"
+            },
+            {
+              "HostHeaderParameters": {
+                "Action": "custom",
+                "ServerName": "cloudflare-dns.com"
+              },
+              "Name": "HostHeader"
+            },
+            {
+              "Name": "UpstreamURLRewrite",
+              "UpstreamURLRewriteParameters": {
+                "Action": "replace",
+                "Type": "Path",
+                "Value": "/dns-query"
+              }
+            }
+          ],
+          "Condition": "${http.request.host} in ['doh.gohj99.site'] and ${http.request.uri.path} in ['/gohj99']",
+          "SubRules": [
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "ModifyRequestHeaderParameters": {
+                        "HeaderActions": [
+                          {
+                            "Action": "set",
+                            "Name": "accept",
+                            "Value": "application/dns-json"
+                          }
+                        ]
+                      },
+                      "Name": "ModifyRequestHeader"
+                    },
+                    {
+                      "ModifyResponseHeaderParameters": {
+                        "HeaderActions": [
+                          {
+                            "Action": "set",
+                            "Name": "content-type",
+                            "Value": "application/json"
+                          }
+                        ]
+                      },
+                      "Name": "ModifyResponseHeader"
+                    }
+                  ],
+                  "Condition": "${http.request.method} in ['GET'] and ${http.request.uri.args['name']} exists and not lower(${http.request.headers['accept']}) in ['application/dns-message']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "dns.google",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "HostHeaderParameters": {
+                        "Action": "custom",
+                        "ServerName": "dns.google"
+                      },
+                      "Name": "HostHeader"
+                    }
+                  ],
+                  "Condition": "${http.request.method} in ['POST']"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "RuleName": "DoH-Configuration"
+    },
+    {
+      "Branches": [
+        {
+          "Condition": "${http.request.host} in ['*.github.gohj99.site', 'github.gohj99.site']",
+          "SubRules": [
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "HttpResponseParameters": {
+                        "ResponsePage": "p-3v6f4ig0x5zi",
+                        "StatusCode": 403
+                      },
+                      "Name": "HttpResponse"
+                    }
+                  ],
+                  "Condition": "${http.request.headers['User-Agent']} matches '(?i)(Googlebot|Google-InspectionTool|GoogleOther(?:-Image|-Video)?|Google-CloudVertexBot|bingbot|msnbot|BingPreview|MicrosoftPreview|BingVideoPreview|AdIdxBot|Baiduspider|YisouSpider|Sogou|360Spider|HaosouSpider|YandexBot|DuckDuckBot|Applebot|PetalBot|Bytespider|Qwantify|SeznamBot|Exabot|ia_archiver|archive.org_bot|heritrix|GPTBot|OAI-SearchBot|ChatGPT-User|ClaudeBot|Claude-SearchBot|Claude-User|anthropic-ai|PerplexityBot|Perplexity-User|meta-externalagent|meta-webindexer|Meta-ExternalFetcher|facebookexternalhit|Facebot|Amazonbot|SemrushBot(?:-SA)?|AhrefsBot|MJ12bot|DotBot|DataForSeoBot|BLEXBot|SerpstatBot|SeobilityBot|SiteAuditBot|Screaming Frog SEO Spider|rogerbot|MegaIndex|linkdexbot|SISTRIX|BacklinksExtendedBot|Twitterbot|LinkedInBot|Discordbot|TelegramBot|Slackbot|WhatsApp|Pinterestbot|redditbot|SkypeUriPreview)' or not ${http.request.headers['User-Agent']} exists"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "HttpResponseParameters": {
+                        "ResponsePage": "p-3v6f4ig0x5zi",
+                        "StatusCode": 403
+                      },
+                      "Name": "HttpResponse"
+                    }
+                  ],
+                  "Condition": "${http.request.ip.country} in ['KP']"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "HttpResponseParameters": {
+                        "ResponsePage": "p-3v89u7d7ty1b",
+                        "StatusCode": 404
+                      },
+                      "Name": "HttpResponse"
+                    }
+                  ],
+                  "Condition": "not ${http.request.headers['host']} in ['github.gohj99.site', 'api.github.gohj99.site', 'raw.github.gohj99.site', 'camo.github.gohj99.site', 'docs.github.gohj99.site', 'gist.github.gohj99.site', 'assets.github.gohj99.site', 'avatars.github.gohj99.site', 'objects.github.gohj99.site', 'codeload.github.gohj99.site', 'ghcr.github.gohj99.site', 'gist-assets.github.gohj99.site', 'user-images.github.gohj99.site', 'private-user-images.github.gohj99.site', 'release-assets.github.gohj99.site', 'github-releases.github.gohj99.site']"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "RuleName": "github-proxy-ban"
+    },
+    {
+      "Branches": [
+        {
+          "Condition": "${http.request.host} in ['*.github.gohj99.site', 'github.gohj99.site']",
+          "SubRules": [
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "HttpResponseParameters": {
+                        "ResponsePage": "p-3v6pst7jf34f",
+                        "StatusCode": 403
+                      },
+                      "Name": "HttpResponse"
+                    }
+                  ],
+                  "Condition": "${http.request.uri.path} in ['/static/content-blocked.html']"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "HttpResponseParameters": {
+                        "ResponsePage": "p-3v6q6j90g77y",
+                        "StatusCode": 200
+                      },
+                      "Name": "HttpResponse"
+                    }
+                  ],
+                  "Condition": "${http.request.uri.path} in ['/static/github-hook.js']"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "HttpResponseParameters": {
+                        "ResponsePage": "p-3v6qcujfu35m",
+                        "StatusCode": 200
+                      },
+                      "Name": "HttpResponse"
+                    }
+                  ],
+                  "Condition": "${http.request.uri.path} in ['/robots.txt']"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "RuleName": "github-proxy-page"
+    },
+    {
+      "Branches": [
+        {
+          "Actions": [
+            {
+              "ModifyResponseHeaderParameters": {
+                "HeaderActions": [
+                  {
+                    "Action": "set",
+                    "Name": "Access-Control-Allow-Origin",
+                    "Value": "*"
+                  },
+                  {
+                    "Action": "set",
+                    "Name": "Access-Control-Allow-Methods",
+                    "Value": " POST,GET,PUT"
+                  }
+                ]
+              },
+              "Name": "ModifyResponseHeader"
+            }
+          ],
+          "Condition": "${http.request.host} in ['*.github.gohj99.site', 'github.gohj99.site']"
+        }
+      ],
+      "RuleName": "CORS-Configuration"
+    },
+    {
+      "Branches": [
+        {
+          "Actions": [
+            {
+              "HostHeaderParameters": {
+                "Action": "custom",
+                "ServerName": "github.com"
+              },
+              "Name": "HostHeader"
+            },
+            {
+              "Name": "UpstreamRequest",
+              "UpstreamRequestParameters": {
+                "Cookie": {
+                  "Action": "full",
+                  "Switch": "on"
+                },
+                "QueryString": {
+                  "Action": "full",
+                  "Switch": "on"
+                }
+              }
+            },
+            {
+              "Name": "UpstreamFollowRedirect",
+              "UpstreamFollowRedirectParameters": {
+                "MaxTimes": 5,
+                "Switch": "on"
+              }
+            },
+            {
+              "CacheParameters": {
+                "NoCache": {
+                  "Switch": "on"
+                }
+              },
+              "Name": "Cache"
+            },
+            {
+              "MaxAgeParameters": {
+                "CacheTime": 0,
+                "FollowOrigin": "off"
+              },
+              "Name": "MaxAge"
+            },
+            {
+              "ModifyOriginParameters": {
+                "HTTPSOriginPort": 443,
+                "Origin": "github.com",
+                "OriginProtocol": "https",
+                "OriginType": "IPDomain"
+              },
+              "Name": "ModifyOrigin"
+            }
+          ],
+          "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} matches '/.+\\\\.git/(info/refs|git-upload-pack|git-receive-pack)'"
+        }
+      ],
+      "RuleName": "Git Smart HTTP"
+    },
+    {
+      "Branches": [
+        {
+          "Condition": "${http.request.host} in ['*.github.gohj99.site']",
+          "SubRules": [
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "Name": "RangeOriginPull",
+                      "RangeOriginPullParameters": {
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "HostHeaderParameters": {
+                        "Action": "custom",
+                        "ServerName": "codeload.github.com"
+                      },
+                      "Name": "HostHeader"
+                    },
+                    {
+                      "Name": "UpstreamRequest",
+                      "UpstreamRequestParameters": {
+                        "Cookie": {
+                          "Action": "full",
+                          "Switch": "on"
+                        },
+                        "QueryString": {
+                          "Action": "full",
+                          "Switch": "on"
+                        }
+                      }
+                    },
+                    {
+                      "Name": "UpstreamFollowRedirect",
+                      "UpstreamFollowRedirectParameters": {
+                        "MaxTimes": 5,
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "codeload.github.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['codeload.github.gohj99.site']"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "Name": "RangeOriginPull",
+                      "RangeOriginPullParameters": {
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "HostHeaderParameters": {
+                        "Action": "custom",
+                        "ServerName": "release-assets.githubusercontent.com"
+                      },
+                      "Name": "HostHeader"
+                    },
+                    {
+                      "Name": "UpstreamRequest",
+                      "UpstreamRequestParameters": {
+                        "Cookie": {
+                          "Action": "full",
+                          "Switch": "on"
+                        },
+                        "QueryString": {
+                          "Action": "full",
+                          "Switch": "on"
+                        }
+                      }
+                    },
+                    {
+                      "Name": "UpstreamFollowRedirect",
+                      "UpstreamFollowRedirectParameters": {
+                        "MaxTimes": 5,
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "release-assets.githubusercontent.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['release-assets.github.gohj99.site']"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "Name": "RangeOriginPull",
+                      "RangeOriginPullParameters": {
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "HostHeaderParameters": {
+                        "Action": "custom",
+                        "ServerName": "github-releases.githubusercontent.com"
+                      },
+                      "Name": "HostHeader"
+                    },
+                    {
+                      "Name": "UpstreamRequest",
+                      "UpstreamRequestParameters": {
+                        "Cookie": {
+                          "Action": "full",
+                          "Switch": "on"
+                        },
+                        "QueryString": {
+                          "Action": "full",
+                          "Switch": "on"
+                        }
+                      }
+                    },
+                    {
+                      "Name": "UpstreamFollowRedirect",
+                      "UpstreamFollowRedirectParameters": {
+                        "MaxTimes": 5,
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "github-releases.githubusercontent.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['github-releases.github.gohj99.site']"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "RuleName": "GitHub Download Proxy 1"
+    },
+    {
+      "Branches": [
+        {
+          "Condition": "${http.request.host} in ['*.github.gohj99.site']",
+          "SubRules": [
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "Name": "RangeOriginPull",
+                      "RangeOriginPullParameters": {
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "HostHeaderParameters": {
+                        "Action": "custom",
+                        "ServerName": "objects.githubusercontent.com"
+                      },
+                      "Name": "HostHeader"
+                    },
+                    {
+                      "Name": "UpstreamRequest",
+                      "UpstreamRequestParameters": {
+                        "Cookie": {
+                          "Action": "full",
+                          "Switch": "on"
+                        },
+                        "QueryString": {
+                          "Action": "full",
+                          "Switch": "on"
+                        }
+                      }
+                    },
+                    {
+                      "Name": "UpstreamFollowRedirect",
+                      "UpstreamFollowRedirectParameters": {
+                        "MaxTimes": 5,
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "objects.githubusercontent.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['objects.github.gohj99.site']"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "Name": "RangeOriginPull",
+                      "RangeOriginPullParameters": {
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "Name": "UpstreamRequest",
+                      "UpstreamRequestParameters": {
+                        "Cookie": {
+                          "Action": "full",
+                          "Switch": "on"
+                        },
+                        "QueryString": {
+                          "Action": "full",
+                          "Switch": "on"
+                        }
+                      }
+                    },
+                    {
+                      "Name": "UpstreamFollowRedirect",
+                      "UpstreamFollowRedirectParameters": {
+                        "MaxTimes": 5,
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "HostHeaderParameters": {
+                        "Action": "custom",
+                        "ServerName": "raw.githubusercontent.com"
+                      },
+                      "Name": "HostHeader"
+                    },
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "raw.githubusercontent.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['raw.github.gohj99.site']"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "Name": "UpstreamRequest",
+                      "UpstreamRequestParameters": {
+                        "Cookie": {
+                          "Action": "full",
+                          "Switch": "on"
+                        },
+                        "QueryString": {
+                          "Action": "full",
+                          "Switch": "on"
+                        }
+                      }
+                    },
+                    {
+                      "Name": "UpstreamFollowRedirect",
+                      "UpstreamFollowRedirectParameters": {
+                        "MaxTimes": 5,
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "HostHeaderParameters": {
+                        "Action": "custom",
+                        "ServerName": "camo.githubusercontent.com"
+                      },
+                      "Name": "HostHeader"
+                    },
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "camo.githubusercontent.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['camo.github.gohj99.site']"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "RuleName": "GitHub Download Proxy 2"
+    },
+    {
+      "Branches": [
+        {
+          "Condition": "${http.request.host} in ['*.github.gohj99.site']",
+          "SubRules": [
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "Name": "UpstreamRequest",
+                      "UpstreamRequestParameters": {
+                        "Cookie": {
+                          "Action": "full",
+                          "Switch": "on"
+                        },
+                        "QueryString": {
+                          "Action": "full",
+                          "Switch": "on"
+                        }
+                      }
+                    },
+                    {
+                      "Name": "UpstreamFollowRedirect",
+                      "UpstreamFollowRedirectParameters": {
+                        "MaxTimes": 5,
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "HostHeaderParameters": {
+                        "Action": "custom",
+                        "ServerName": "github.githubassets.com"
+                      },
+                      "Name": "HostHeader"
+                    },
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "github.githubassets.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['assets.github.gohj99.site']"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "Name": "UpstreamRequest",
+                      "UpstreamRequestParameters": {
+                        "Cookie": {
+                          "Action": "full",
+                          "Switch": "on"
+                        },
+                        "QueryString": {
+                          "Action": "full",
+                          "Switch": "on"
+                        }
+                      }
+                    },
+                    {
+                      "Name": "UpstreamFollowRedirect",
+                      "UpstreamFollowRedirectParameters": {
+                        "MaxTimes": 5,
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "HostHeaderParameters": {
+                        "Action": "custom",
+                        "ServerName": "user-images.githubusercontent.com"
+                      },
+                      "Name": "HostHeader"
+                    },
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "user-images.githubusercontent.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['user-images.github.gohj99.site']"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "Name": "UpstreamRequest",
+                      "UpstreamRequestParameters": {
+                        "Cookie": {
+                          "Action": "full",
+                          "Switch": "on"
+                        },
+                        "QueryString": {
+                          "Action": "full",
+                          "Switch": "on"
+                        }
+                      }
+                    },
+                    {
+                      "Name": "UpstreamFollowRedirect",
+                      "UpstreamFollowRedirectParameters": {
+                        "MaxTimes": 5,
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "HostHeaderParameters": {
+                        "Action": "custom",
+                        "ServerName": "avatars.githubusercontent.com"
+                      },
+                      "Name": "HostHeader"
+                    },
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "avatars.githubusercontent.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['avatars.github.gohj99.site']"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "RuleName": "GitHub Download Proxy 3"
+    },
+    {
+      "Branches": [
+        {
+          "Condition": "${http.request.host} in ['*.github.gohj99.site']",
+          "SubRules": [
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "Name": "UpstreamRequest",
+                      "UpstreamRequestParameters": {
+                        "Cookie": {
+                          "Action": "full",
+                          "Switch": "on"
+                        },
+                        "QueryString": {
+                          "Action": "full",
+                          "Switch": "on"
+                        }
+                      }
+                    },
+                    {
+                      "Name": "UpstreamFollowRedirect",
+                      "UpstreamFollowRedirectParameters": {
+                        "MaxTimes": 5,
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "HostHeaderParameters": {
+                        "Action": "custom",
+                        "ServerName": "gist-assets.githubusercontent.com"
+                      },
+                      "Name": "HostHeader"
+                    },
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "gist-assets.githubusercontent.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['gist-assets.github.gohj99.site']"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "Name": "UpstreamRequest",
+                      "UpstreamRequestParameters": {
+                        "Cookie": {
+                          "Action": "full",
+                          "Switch": "on"
+                        },
+                        "QueryString": {
+                          "Action": "full",
+                          "Switch": "on"
+                        }
+                      }
+                    },
+                    {
+                      "Name": "UpstreamFollowRedirect",
+                      "UpstreamFollowRedirectParameters": {
+                        "MaxTimes": 5,
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "HostHeaderParameters": {
+                        "Action": "custom",
+                        "ServerName": "private-user-images.githubusercontent.com"
+                      },
+                      "Name": "HostHeader"
+                    },
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "private-user-images.githubusercontent.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['private-user-images.github.gohj99.site']"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "RuleName": "GitHub Download Proxy 4"
+    },
+    {
+      "Branches": [
+        {
+          "Actions": [
+            {
+              "Name": "StatusCodeCache",
+              "StatusCodeCacheParameters": {
+                "StatusCodeCacheParams": [
+                  {
+                    "CacheTime": 720,
+                    "StatusCode": 404
+                  },
+                  {
+                    "CacheTime": 300,
+                    "StatusCode": 403
+                  }
+                ]
+              }
+            },
+            {
+              "CacheKeyParameters": {
+                "FullURLCache": "on",
+                "IgnoreCase": "off",
+                "QueryString": {
+                  "Switch": "off"
+                }
+              },
+              "Name": "CacheKey"
+            }
+          ],
+          "Condition": "${http.request.host} in ['github.gohj99.site'] and not ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/netlify.md', '/gohj99/GitHub-Proxy/blob/master/test/esa.md', '/gohj99/GitHub-Proxy/blob/master/test/deno.md', '/gohj99/GitHub-Proxy/blob/master/test/vercel.md', '/gohj99/GitHub-Proxy/blob/master/test/server-1.md', '/gohj99/GitHub-Proxy/blob/master/test/server-2.md', '/gohj99/GitHub-Proxy/blob/master/test/server-3.md'] and not ${http.request.uri.path} matches '/.+\\\\.git/(info/refs|git-upload-pack|git-receive-pack)' or ${http.request.host} in ['*.github.gohj99.site'] and lower(${http.request.headers['host']}) in ['ghcr.github.gohj99.site', 'gist.github.gohj99.site', 'docs.github.gohj99.site', 'api.github.gohj99.site']",
+          "SubRules": [
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "MaxAgeParameters": {
+                        "CacheTime": 300,
+                        "FollowOrigin": "off"
+                      },
+                      "Name": "MaxAge"
+                    },
+                    {
+                      "ModifyResponseHeaderParameters": {
+                        "HeaderActions": [
+                          {
+                            "Action": "set",
+                            "Name": "Cache-Control",
+                            "Value": "public, max-age=300"
+                          }
+                        ]
+                      },
+                      "Name": "ModifyResponseHeader"
+                    }
+                  ],
+                  "Condition": "${http.response.headers['Content-Type']} matches '(?i)^text/html(?:;.*)?$'"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 1200,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    },
+                    {
+                      "Name": "OfflineCache",
+                      "OfflineCacheParameters": {
+                        "Switch": "on"
+                      }
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} matches '^/(?:[^/]+/)*[^/.]+/?$' and ${http.request.headers['Accept']} matches '(?i)(?:^|,)\\\\s*(?:text/html|application/xhtml\\\\+xml)(?:\\\\s*;[^,]*)?(?:,|$)' and not lower(${http.request.headers['x-requested-with']}) in ['XMLHttpRequest'] and not lower(${http.request.headers['x-github-app-type']}) in ['dataRouter'] and not lower(${http.request.headers['Accept']}) in ['application/json']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 86400,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    },
+                    {
+                      "Name": "OfflineCache",
+                      "OfflineCacheParameters": {
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "CachePrefreshParameters": {
+                        "CacheTimePercent": 90,
+                        "Switch": "on"
+                      },
+                      "Name": "CachePrefresh"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['github.gohj99.site', 'docs.github.gohj99.site', 'gist.github.gohj99.site'] and lower(${http.request.uri.path}) in ['/']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 300,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "not lower(${http.request.headers['host']}) in ['api.github.gohj99.site']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 30,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "not ${http.request.headers['Accept']} matches '(?i)(?:^|,)\\\\s*application/json(?:\\\\s*;[^,]*)?(?:,|$)'"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "RuleName": "GHProxy-Cache-Configuration"
+    },
+    {
+      "Branches": [
+        {
+          "Actions": [
+            {
+              "Name": "StatusCodeCache",
+              "StatusCodeCacheParameters": {
+                "StatusCodeCacheParams": [
+                  {
+                    "CacheTime": 30,
+                    "StatusCode": 404
+                  },
+                  {
+                    "CacheTime": 60,
+                    "StatusCode": 403
+                  }
+                ]
+              }
+            }
+          ],
+          "Condition": "${http.request.host} in ['*.github.gohj99.site'] and not lower(${http.request.headers['host']}) in ['ghcr.github.gohj99.site', 'gist.github.gohj99.site', 'docs.github.gohj99.site', 'api.github.gohj99.site']",
+          "SubRules": [
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "MaxAgeParameters": {
+                        "CacheTime": 43200,
+                        "FollowOrigin": "off"
+                      },
+                      "Name": "MaxAge"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 1800,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    },
+                    {
+                      "Name": "OfflineCache",
+                      "OfflineCacheParameters": {
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "CachePrefreshParameters": {
+                        "CacheTimePercent": 90,
+                        "Switch": "on"
+                      },
+                      "Name": "CachePrefresh"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.file_extension}) in ['js', 'css', 'woff2', 'woff', 'ttf', 'eot']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 600,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    },
+                    {
+                      "Name": "OfflineCache",
+                      "OfflineCacheParameters": {
+                        "Switch": "on"
+                      }
+                    },
+                    {
+                      "CachePrefreshParameters": {
+                        "CacheTimePercent": 90,
+                        "Switch": "on"
+                      },
+                      "Name": "CachePrefresh"
+                    }
+                  ],
+                  "Condition": "*"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "RuleName": "GHProxy-Other-Cache-Configuration"
+    },
+    {
+      "Branches": [
+        {
+          "Condition": "${http.request.host} in ['github.gohj99.site', '*.github.gohj99.site']",
+          "SubRules": [
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "HttpResponseParameters": {
+                        "ResponsePage": "p-3v89u7d7ty1b",
+                        "StatusCode": 404
+                      },
+                      "Name": "HttpResponse"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.uri.path}) in ['/login', '/login/*', '/signup', '/signup/*', '/copilot', '/copilot/*', '/bannedbook', '/bannedbook/*'] and ${http.request.host} in ['github.gohj99.site']"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "RuleName": "Ban-Path"
+    },
+    {
+      "Branches": [
+        {
+          "Condition": "${http.request.host} in ['*.github.gohj99.site', 'github.gohj99.site']",
+          "SubRules": [
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "og-3vni86rrqgtz@zone-3v5iy4p4cq0s",
+                        "OriginProtocol": "https",
+                        "OriginType": "OriginGroup"
+                      },
+                      "Name": "ModifyOrigin"
+                    }
+                  ],
+                  "Condition": "lower(${http.request.headers['host']}) in ['api.github.gohj99.site']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "163.192.26.203",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 30,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/server-3.md']"
+                }
+              ]
+            },
+            {
+              "Branches": [
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "magical-faun-12e6f9.netlify.app",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 5,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/netlify.md']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "github.gohj99.site.a1.initaa.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 5,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/esa.md']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "alias.deno.net",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 5,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and lower(${http.request.uri.path}) in ['/gohj99/GitHub-Proxy/blob/master/test/deno.md']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "9d23bb0817e1f7b5.vercel-dns-017.com",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 5,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/vercel.md']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "104.249.156.202",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 30,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/server-1.md']"
+                },
+                {
+                  "Actions": [
+                    {
+                      "ModifyOriginParameters": {
+                        "HTTPSOriginPort": 443,
+                        "Origin": "155.248.194.52",
+                        "OriginProtocol": "https",
+                        "OriginType": "IPDomain"
+                      },
+                      "Name": "ModifyOrigin"
+                    },
+                    {
+                      "CacheParameters": {
+                        "CustomTime": {
+                          "CacheTime": 30,
+                          "IgnoreCacheControl": "on",
+                          "Switch": "on"
+                        }
+                      },
+                      "Name": "Cache"
+                    }
+                  ],
+                  "Condition": "${http.request.host} in ['github.gohj99.site'] and ${http.request.uri.path} in ['/gohj99/GitHub-Proxy/blob/master/test/server-2.md']"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "RuleName": "GP-Origin-Group-Selection"
+    }
+  ],
+  "WebSecurity": {
+    "HostPolicy": [
+      {
+        "Host": "*.github.gohj99.site",
+        "PolicyType": "ZoneDefault"
+      },
+      {
+        "Host": "blank-func-zone-3v5iy4p4cq0s-1301358082.eo-edgefunctions.com",
+        "PolicyType": "ZoneDefault"
+      },
+      {
+        "Host": "github-proxy-zone-3v5iy4p4cq0s-1301358082.eo-edgefunctions.com",
+        "PolicyType": "ZoneDefault"
+      },
+      {
+        "Host": "github.gohj99.site",
+        "PolicyType": "ZoneDefault"
+      }
+    ],
+    "Templates": [],
+    "ZoneDefaultPolicy": {
+      "BotManagement": {
+        "BasicBotSettings": {
+          "BotIntelligence": {
+            "BotRatings": {
+              "HighRiskBotRequestsAction": {
+                "Name": "Monitor"
+              },
+              "HumanRequestsAction": {
+                "Name": "Allow"
+              },
+              "LikelyBotRequestsAction": {
+                "Name": "Monitor"
+              },
+              "VerifiedBotRequestsAction": {
+                "Name": "Monitor"
+              }
+            },
+            "Enabled": "off"
+          },
+          "IPReputation": {
+            "Enabled": "off"
+          },
+          "KnownBotCategories": {
+            "BotManagementActionOverrides": []
+          },
+          "SearchEngineBots": {
+            "BotManagementActionOverrides": []
+          },
+          "SourceIDC": {
+            "BotManagementActionOverrides": []
+          }
+        },
+        "BrowserImpersonationDetection": {
+          "Rules": []
+        },
+        "ClientAttestationRules": {
+          "Rules": []
+        },
+        "CustomRules": {
+          "Rules": []
+        },
+        "Enabled": "off"
+      },
+      "BotManagementLite": {
+        "AICrawlerDetection": {
+          "Action": {
+            "ChallengeActionParameters": {
+              "ChallengeOption": "ManagedChallenge"
+            },
+            "Name": "Challenge"
+          },
+          "Enabled": "on"
+        },
+        "CAPTCHAPageChallenge": {
+          "Enabled": "off"
+        }
+      },
+      "CustomRules": {
+        "Rules": [
+          {
+            "Action": {
+              "Name": "Deny"
+            },
+            "Condition": "${http.request.ip} in ['95.105.69.4']",
+            "Enabled": "on",
+            "Id": "2181077701",
+            "Name": "未命名规则",
+            "Priority": 0,
+            "RuleType": "BasicAccessRule"
+          }
+        ]
+      },
+      "DefaultDenySecurityActionParameters": {
+        "ManagedRules": {
+          "ErrorPageId": "default",
+          "ResponseCode": "566",
+          "ReturnCustomPage": "on"
+        },
+        "OtherModules": {
+          "ErrorPageId": "default",
+          "ResponseCode": "567",
+          "ReturnCustomPage": "on"
+        }
+      },
+      "ExceptionRules": {
+        "Rules": []
+      },
+      "HttpDDoSProtection": {
+        "AdaptiveFrequencyControl": {
+          "Action": {
+            "Name": "Deny"
+          },
+          "Enabled": "on",
+          "Sensitivity": "Loose"
+        },
+        "BandwidthAbuseDefense": {
+          "Action": {
+            "Name": "Deny"
+          },
+          "Enabled": "on"
+        },
+        "ClientFiltering": {
+          "Action": {
+            "ChallengeActionParameters": {
+              "ChallengeOption": "JSChallenge"
+            },
+            "Name": "Challenge"
+          },
+          "Enabled": "on"
+        },
+        "SlowAttackDefense": {
+          "Action": {
+            "Name": "Deny"
+          },
+          "Enabled": "on",
+          "MinimalRequestBodyTransferRate": {
+            "CountingPeriod": "60s",
+            "Enabled": "off",
+            "MinimalAvgTransferRateThreshold": "80bps"
+          },
+          "RequestBodyTransferTimeout": {
+            "Enabled": "off",
+            "IdleTimeout": "5s"
+          }
+        }
+      },
+      "ManagedRules": {
+        "AutoUpdate": {
+          "AutoUpdateToLatestVersion": "off",
+          "RulesetVersion": "2025-12-05T06:32:14Z"
+        },
+        "DetectionOnly": "off",
+        "Enabled": "on",
+        "ManagedRuleGroups": [
+          {
+            "Action": {
+              "Name": "Monitor"
+            },
+            "GroupId": "wafgroup-free",
+            "RuleActions": [],
+            "SensitivityLevel": "strict"
+          }
+        ],
+        "SemanticAnalysis": "off"
+      },
+      "RateLimitingRules": {
+        "Rules": [
+          {
+            "Action": {
+              "Name": "Deny"
+            },
+            "ActionDuration": "10s",
+            "Condition": "${http.request.host} in ['api.github.gohj99.site']",
+            "CountBy": [
+              "http.request.ip"
+            ],
+            "CountingPeriod": "10s",
+            "Enabled": "on",
+            "Id": "2181077300",
+            "MaxRequestThreshold": 30,
+            "Mode": "Block",
+            "Name": "API-Rate-limiting",
+            "Priority": 50
+          }
+        ]
+      },
+      "SecurityHeadersToOrigin": {
+        "BotIdentificationHeaders": [],
+        "BotManagementHeaders": [],
+        "ClientFingerprintHeaders": []
+      }
+    }
+  },
+  "ZoneConfig": {
+    "AccelerateMainland": {
+      "Switch": "off"
+    },
+    "Cache": {
+      "CustomTime": {
+        "CacheTime": 2592000,
+        "Switch": "off"
+      },
+      "FollowOrigin": {
+        "DefaultCache": "on",
+        "DefaultCacheStrategy": "on",
+        "DefaultCacheTime": 0,
+        "Switch": "on"
+      },
+      "NoCache": {
+        "Switch": "off"
+      }
+    },
+    "CacheKey": {
+      "FullURLCache": "on",
+      "IgnoreCase": "off",
+      "QueryString": {
+        "Action": "includeCustom",
+        "Switch": "off"
+      }
+    },
+    "CachePrefresh": {
+      "CacheTimePercent": 90,
+      "Switch": "on"
+    },
+    "ClientIPCountry": {
+      "Switch": "off"
+    },
+    "ClientIPHeader": {
+      "Switch": "off"
+    },
+    "Compression": {
+      "Algorithms": [
+        "brotli",
+        "gzip"
+      ],
+      "Switch": "on"
+    },
+    "ForceRedirectHTTPS": {
+      "RedirectStatusCode": 302,
+      "Switch": "on"
+    },
+    "HSTS": {
+      "IncludeSubDomains": "off",
+      "Preload": "off",
+      "Switch": "off",
+      "Timeout": 0
+    },
+    "HTTP2": {
+      "Switch": "on"
+    },
+    "IPv6": {
+      "Switch": "on"
+    },
+    "MaxAge": {
+      "CacheTime": 600,
+      "FollowOrigin": "on"
+    },
+    "NetworkErrorLogging": {
+      "Switch": "on"
+    },
+    "OCSPStapling": {
+      "Switch": "on"
+    },
+    "OfflineCache": {
+      "Switch": "on"
+    },
+    "PostMaxSize": {
+      "MaxSize": 838860800,
+      "Switch": "on"
+    },
+    "QUIC": {
+      "Switch": "off"
+    },
+    "SmartRouting": {
+      "Switch": "off"
+    },
+    "StandardDebug": {
+      "AllowClientIPList": [
+        "0.0.0.0/0"
+      ],
+      "Expires": "2026-10-08T05:16:35Z",
+      "Switch": "off"
+    },
+    "TLSConfig": {
+      "CipherSuite": "loose-v2023",
+      "Version": [
+        "TLSv1.2",
+        "TLSv1.3"
+      ]
+    },
+    "UpstreamHTTP2": {
+      "Switch": "on"
+    },
+    "WebSocket": {
+      "Switch": "on",
+      "Timeout": 30
+    },
+    "gRPC": {
+      "Switch": "on"
+    }
+  }
+}

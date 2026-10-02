@@ -1,4 +1,81 @@
 (() => {
+  // Run before GitHub's scripts capture fetch, including navigation prefetches.
+  // EdgeOne must include this query parameter in its cache key. Accept still
+  // selects the upstream response format; the parameter only separates URLs.
+  const installJSONFetchHook = () => {
+    const hookKey = Symbol.for("GitHubProxy.jsonFetchHook");
+    const originalFetch = window.fetch;
+    if (typeof originalFetch !== "function" || window[hookKey]) return;
+
+    const formatParameter = "__ghproxy_format";
+    const acceptsJSON = (accept) => (accept || "").split(",").some((entry) => {
+      const [mediaType, ...parameters] = entry.split(";");
+      if (mediaType.trim().toLowerCase() !== "application/json") return false;
+      const quality = parameters.find((parameter) => /^\s*q\s*=/i.test(parameter));
+      return !quality || Number(quality.split("=")[1].trim()) > 0;
+    });
+
+    // GitHub also uses Response.url for navigation redirects. Keep the internal
+    // cache parameter out of that URL, while retaining the native Response/body.
+    const cleanResponseURL = (response) => {
+      try {
+        const url = new URL(response.url);
+        if (url.origin !== window.location.origin ||
+            url.searchParams.get(formatParameter) !== "json") return response;
+
+        url.searchParams.delete(formatParameter);
+        const originalClone = response.clone;
+        Object.defineProperties(response, {
+          url: { configurable: true, value: url.href },
+          clone: {
+            configurable: true,
+            writable: true,
+            value: function () {
+              return cleanResponseURL(originalClone.call(this));
+            },
+          },
+        });
+      } catch (_) {
+        // Opaque responses have no URL; leave them and their bodies untouched.
+      }
+      return response;
+    };
+
+    window.fetch = function (input, init) {
+      let requestInput = input;
+      let marked = false;
+      try {
+        const request = input instanceof Request ? input : null;
+        const method = String(init?.method ?? request?.method ?? "GET").toUpperCase();
+        const headers = new Headers(init?.headers !== undefined ? init.headers : request?.headers);
+        if ((method === "GET" || method === "HEAD") && acceptsJSON(headers.get("Accept"))) {
+          const url = new URL(request ? request.url : input, document.baseURI || window.location.href);
+          if (url.origin === window.location.origin) {
+            if (!url.searchParams.has(formatParameter)) {
+              // Append without re-encoding existing GitHub query parameters.
+              url.search += `${url.search ? "&" : "?"}${formatParameter}=json`;
+            } else if (url.searchParams.getAll(formatParameter).length !== 1 ||
+                       url.searchParams.get(formatParameter) !== "json") {
+              url.searchParams.set(formatParameter, "json");
+            }
+            requestInput = request ? new Request(url.href, request) : url.href;
+            marked = true;
+          }
+        }
+      } catch (_) {
+        // Let native fetch handle unsupported/invalid inputs as it normally does.
+      }
+
+      // Preserve init overrides, credentials, cancellation, and other options.
+      // Never retry a failed network request through the unmarked cache entry.
+      const result = originalFetch.call(window, requestInput, init);
+      return marked ? result.then(cleanResponseURL) : result;
+    };
+    window[hookKey] = true;
+  };
+
+  installJSONFetchHook();
+
   // Content-blocking starter list. Keep entries specific to reduce false positives.
   // This is a site policy configuration, not an exhaustive or official legal list.
   const BLOCKED_TERMS = {
