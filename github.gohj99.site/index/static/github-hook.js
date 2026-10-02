@@ -1,82 +1,5 @@
 (() => {
-  // Run before GitHub's scripts capture fetch, including navigation prefetches.
-  // EdgeOne must include this query parameter in its cache key. Accept still
-  // selects the upstream response format; the parameter only separates URLs.
-  const installJSONFetchHook = () => {
-    const hookKey = Symbol.for("GitHubProxy.jsonFetchHook");
-    const originalFetch = window.fetch;
-    if (typeof originalFetch !== "function" || window[hookKey]) return;
-
-    const formatParameter = "__ghproxy_format";
-    const acceptsJSON = (accept) => (accept || "").split(",").some((entry) => {
-      const [mediaType, ...parameters] = entry.split(";");
-      if (mediaType.trim().toLowerCase() !== "application/json") return false;
-      const quality = parameters.find((parameter) => /^\s*q\s*=/i.test(parameter));
-      return !quality || Number(quality.split("=")[1].trim()) > 0;
-    });
-
-    // GitHub also uses Response.url for navigation redirects. Keep the internal
-    // cache parameter out of that URL, while retaining the native Response/body.
-    const cleanResponseURL = (response) => {
-      try {
-        const url = new URL(response.url);
-        if (url.origin !== window.location.origin ||
-            url.searchParams.get(formatParameter) !== "json") return response;
-
-        url.searchParams.delete(formatParameter);
-        const originalClone = response.clone;
-        Object.defineProperties(response, {
-          url: { configurable: true, value: url.href },
-          clone: {
-            configurable: true,
-            writable: true,
-            value: function () {
-              return cleanResponseURL(originalClone.call(this));
-            },
-          },
-        });
-      } catch (_) {
-        // Opaque responses have no URL; leave them and their bodies untouched.
-      }
-      return response;
-    };
-
-    window.fetch = function (input, init) {
-      let requestInput = input;
-      let marked = false;
-      try {
-        const request = input instanceof Request ? input : null;
-        const method = String(init?.method ?? request?.method ?? "GET").toUpperCase();
-        const headers = new Headers(init?.headers !== undefined ? init.headers : request?.headers);
-        if ((method === "GET" || method === "HEAD") && acceptsJSON(headers.get("Accept"))) {
-          const url = new URL(request ? request.url : input, document.baseURI || window.location.href);
-          if (url.origin === window.location.origin) {
-            if (!url.searchParams.has(formatParameter)) {
-              // Append without re-encoding existing GitHub query parameters.
-              url.search += `${url.search ? "&" : "?"}${formatParameter}=json`;
-            } else if (url.searchParams.getAll(formatParameter).length !== 1 ||
-                       url.searchParams.get(formatParameter) !== "json") {
-              url.searchParams.set(formatParameter, "json");
-            }
-            requestInput = request ? new Request(url.href, request) : url.href;
-            marked = true;
-          }
-        }
-      } catch (_) {
-        // Let native fetch handle unsupported/invalid inputs as it normally does.
-      }
-
-      // Preserve init overrides, credentials, cancellation, and other options.
-      // Never retry a failed network request through the unmarked cache entry.
-      const result = originalFetch.call(window, requestInput, init);
-      return marked ? result.then(cleanResponseURL) : result;
-    };
-    window[hookKey] = true;
-  };
-
-  installJSONFetchHook();
-
-  // Content-blocking starter list. Keep entries specific to reduce false positives.
+  // Content-blocking configuration. Keep entries specific to reduce false positives.
   // This is a site policy configuration, not an exhaustive or official legal list.
   const BLOCKED_TERMS = {
     nationalSecurity: [
@@ -345,6 +268,83 @@
     { user: "htcc", repo: "" },
   ];
 
+  // Run before GitHub's scripts capture fetch, including navigation prefetches.
+  // EdgeOne must include this query parameter in its cache key. Accept still
+  // selects the upstream response format; the parameter only separates URLs.
+  const installJSONFetchHook = () => {
+    const hookKey = Symbol.for("GitHubProxy.jsonFetchHook");
+    const originalFetch = window.fetch;
+    if (typeof originalFetch !== "function" || window[hookKey]) return;
+
+    const formatParameter = "__ghproxy_format";
+    const acceptsJSON = (accept) => (accept || "").split(",").some((entry) => {
+      const [mediaType, ...parameters] = entry.split(";");
+      if (mediaType.trim().toLowerCase() !== "application/json") return false;
+      const quality = parameters.find((parameter) => /^\s*q\s*=/i.test(parameter));
+      return !quality || Number(quality.split("=")[1].trim()) > 0;
+    });
+
+    // GitHub also uses Response.url for navigation redirects. Keep the internal
+    // cache parameter out of that URL, while retaining the native Response/body.
+    const cleanResponseURL = (response) => {
+      try {
+        const url = new URL(response.url);
+        if (url.origin !== window.location.origin ||
+            url.searchParams.get(formatParameter) !== "json") return response;
+
+        url.searchParams.delete(formatParameter);
+        const originalClone = response.clone;
+        Object.defineProperties(response, {
+          url: { configurable: true, value: url.href },
+          clone: {
+            configurable: true,
+            writable: true,
+            value: function () {
+              return cleanResponseURL(originalClone.call(this));
+            },
+          },
+        });
+      } catch (_) {
+        // Opaque responses have no URL; leave them and their bodies untouched.
+      }
+      return response;
+    };
+
+    window.fetch = function (input, init) {
+      let requestInput = input;
+      let marked = false;
+      try {
+        const request = input instanceof Request ? input : null;
+        const method = String(init?.method ?? request?.method ?? "GET").toUpperCase();
+        const headers = new Headers(init?.headers !== undefined ? init.headers : request?.headers);
+        if ((method === "GET" || method === "HEAD") && acceptsJSON(headers.get("Accept"))) {
+          const url = new URL(request ? request.url : input, document.baseURI || window.location.href);
+          if (url.origin === window.location.origin) {
+            if (!url.searchParams.has(formatParameter)) {
+              // Append without re-encoding existing GitHub query parameters.
+              url.search += `${url.search ? "&" : "?"}${formatParameter}=json`;
+            } else if (url.searchParams.getAll(formatParameter).length !== 1 ||
+                       url.searchParams.get(formatParameter) !== "json") {
+              url.searchParams.set(formatParameter, "json");
+            }
+            requestInput = request ? new Request(url.href, request) : url.href;
+            marked = true;
+          }
+        }
+      } catch (_) {
+        // Let native fetch handle unsupported/invalid inputs as it normally does.
+      }
+
+      // Preserve init overrides, credentials, cancellation, and other options.
+      // Never retry a failed network request through the unmarked cache entry.
+      const result = originalFetch.call(window, requestInput, init);
+      return marked ? result.then(cleanResponseURL) : result;
+    };
+    window[hookKey] = true;
+  };
+
+  installJSONFetchHook();
+
   const normalizeText = (value) => {
     const text = String(value || "");
 
@@ -426,94 +426,23 @@
     if (blocked) return;
     blocked = true;
 
-    // Keep the in-page overlay as the immediate response, then move to the
-    // standalone local page. This prevents a visible gap while redirecting.
     const blockedPageUrl = "/static/content-blocked.html";
     const shouldRedirect = window.location && window.location.pathname !== blockedPageUrl;
-
-    const host = document.createElement("div");
-    host.id = "github-proxy-content-blocked";
-    host.tabIndex = -1;
-    host.setAttribute("role", "alert");
-    host.setAttribute("aria-live", "assertive");
-    host.style.cssText = [
-      "all:initial",
-      "position:fixed!important",
-      "inset:0!important",
-      "z-index:2147483647!important",
-      "display:block!important",
-    ].join(";");
-
-    const shadow = host.attachShadow({ mode: "closed" });
-    shadow.innerHTML = `
-      <style>
-        :host { color-scheme: light; }
-        .page {
-          box-sizing: border-box;
-          width: 100vw;
-          height: 100vh;
-          display: grid;
-          place-items: center;
-          padding: 24px;
-          overflow: hidden;
-          background: #f6f8fa;
-          color: #1f2328;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-        .message { width: min(520px, 100%); text-align: center; }
-        .icon {
-          width: 48px;
-          height: 48px;
-          margin: 0 auto 20px;
-          display: grid;
-          place-items: center;
-          border-radius: 50%;
-          background: #cf222e;
-          color: #fff;
-          font: 700 28px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-        h1 { margin: 0 0 12px; font-size: 24px; line-height: 1.35; font-weight: 600; }
-        p { margin: 0; color: #59636e; font-size: 15px; line-height: 1.7; }
-      </style>
-      <main class="page">
-        <section class="message">
-          <div class="icon" aria-hidden="true">!</div>
-          <h1>此页面无法访问</h1>
-          <p>页面内容不符合本站内容安全规则。</p>
-        </section>
-      </main>
-    `;
-
-    document.documentElement.style.setProperty("overflow", "hidden", "important");
-    document.body.style.setProperty("overflow", "hidden", "important");
-    document.body.appendChild(host);
-    host.focus();
-
-    const stopInteraction = (event) => {
-      if (!host.contains(event.target)) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-      }
-    };
-
-    [
-      "click",
-      "dblclick",
-      "contextmenu",
-      "keydown",
-      "submit",
-      "touchstart",
-      "touchmove",
-      "wheel",
-      "dragstart",
-    ].forEach(
-      (eventName) => document.addEventListener(eventName, stopInteraction, true),
-    );
 
     console.warn("[GitHub Proxy] Page blocked by content policy:", matchedTerm);
 
     if (shouldRedirect) {
-      window.setTimeout(() => window.location.replace(blockedPageUrl), 0);
+      // Clear page content except scripts before redirect
+      if (document.body) {
+        while (document.body.firstChild) {
+          if (document.body.firstChild.tagName === "SCRIPT") {
+            document.body.removeChild(document.body.firstChild);
+            continue;
+          }
+          document.body.removeChild(document.body.firstChild);
+        }
+      }
+      window.location.replace(blockedPageUrl);
     }
   };
 
